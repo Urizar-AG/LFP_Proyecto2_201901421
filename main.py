@@ -27,4 +27,29 @@ if __name__ == '__main__':
     frame.pack(expand = 1)
     frame.config(width = '950', height = '550')
 
+    #Barra de Menú
+    menuBar = Menu(frame)
+    app.config(menu=menuBar)
+
+    #Menú Archvio
+    archivoMenu = Menu(menuBar, tearoff=0)
+    archivoMenu.add_command(label='Cargar')
+    archivoMenu.add_separator()
+    archivoMenu.add_command(label='Salir')
+
+    #Menú Analizar
+    analisisMenu = Menu(menuBar, tearoff=0)
+    analisisMenu.add_command(label='Analizar Archivo')
+
+    #Menú Reportes
+    reporteMenu = Menu(menuBar, tearoff=0)
+    reporteMenu.add_command(label='Tokens')
+    reporteMenu.add_command(label='Errores')
+    reporteMenu.add_command(label='Árbol de Derivación')
+
+    #Añadiendo las opciones a la barra del menú.
+    menuBar.add_cascade(label='Archivo', menu=archivoMenu)
+    menuBar.add_cascade(label='Análisis', menu=analisisMenu)
+    menuBar.add_cascade(label='Generar Reporte', menu=reporteMenu)
+
     app.mainloop()
