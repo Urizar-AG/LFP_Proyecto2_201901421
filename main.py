@@ -1,15 +1,43 @@
 from tkinter import *
-from tkinter import ttk
-import tkinter.font as tkFont
+from tkinter import filedialog, messagebox
+
+doc =''
+editor = '' #El área de edición de la ventana principal
+
+def abrirFile():
+    global doc
+    archivo = filedialog.askopenfilename(
+        title = "Seleccionar un archivo ",
+        #indica el directorio donde se abre el "navegador"
+        initialdir = "../",
+        filetypes = (
+            ("Archivos LFP", "*.lfp"),
+            ("Todos los archivos", "*.*")
+        )
+    )
+    if archivo is None or archivo == "" or archivo == '':
+        #En caso no se seleccione ningún archivo
+        messagebox.showinfo(message="No se cargo ningún archivo.", title="Carga de Archivo")
+        doc = None
+    else:
+        f = open(archivo, mode = "r", encoding = "UTF-8")
+        contenido = f.read()
+        f.close()
+        doc = contenido
+        global editor
+        #Borra el contenido que ya tiene
+        editor.delete(1.0, END)
+        messagebox.showinfo(message="El archivo se cargó correctamente.", title="Carga de Archivo")  
+        #Agrega el cotenido del archivo nuevo.
+        editor.insert(1.0, doc)
 
 if __name__ == '__main__':
-    
+
     app = Tk()
     app.title('Proyecto2 - 201901421')
     icono = PhotoImage(file ='Icono.png')
     app.iconphoto(True, icono)  
     app.resizable(0,0)
-
     w = 1000 #Ancho de la ventana
     h = 600 #Alto de la ventana
     app.update_idletasks()#Geometría precisa
@@ -30,9 +58,9 @@ if __name__ == '__main__':
 
     #Menú Archvio
     archivoMenu = Menu(menuBar, tearoff=0, bg='#333A3B', fg='#FFFFFF')
-    archivoMenu.add_command(label='Cargar')
+    archivoMenu.add_command(label='Abrir', command=lambda:abrirFile())
     archivoMenu.add_separator()
-    archivoMenu.add_command(label='Salir', command= app.quit)
+    archivoMenu.add_command(label='Salir', command=app.quit)
 
     #Menú Analizar
     analisisMenu = Menu(menuBar, tearoff=0, bg='#333A3B', fg='#FFFFFF')
@@ -67,6 +95,7 @@ if __name__ == '__main__':
     #Área de edición
     seccion1 = Label(frame1, text='EDITOR')
     seccion1.pack()
+    #global editor
     editor = Text(frame1, width=50, height=30)
     editor.config(padx=10, pady=10, bd=0, bg='#000000', fg='#FFFFFF', selectbackground="#333A3B", insertbackground="#FFFFFF", font=("Consolas", 12))
     editor.pack_propagate(False)
@@ -79,6 +108,5 @@ if __name__ == '__main__':
     consola.insert(1.0, 'Hola Mundo, esta es la consola del programa.')
     consola.config(state='disabled', padx=10, pady=10, bd=0, bg='#000000', fg ='#08AEF5', selectbackground="#333A3B", font=("Consolas", 12))
     consola.pack()
-
 
     app.mainloop()
