@@ -1,11 +1,13 @@
 from tkinter import *
+from tkinter import ttk
+import tkinter.font as tkFont
 
 if __name__ == '__main__':
+    
     app = Tk()
     app.title('Proyecto2 - 201901421')
-    icono = PhotoImage(file = 'Icono.png')
-    app.iconphoto(True, icono)
-    app.config(bg = '#08AEF5')  
+    icono = PhotoImage(file ='Icono.png')
+    app.iconphoto(True, icono)  
     app.resizable(0,0)
 
     w = 1000 #Ancho de la ventana
@@ -22,27 +24,22 @@ if __name__ == '__main__':
     app.geometry('%dx%d+%d+%d' % (w, h, x, y))
     app.deiconify()
 
-    #Frame
-    frame = Frame(app)
-    frame.pack(expand = 1)
-    frame.config(width = '950', height = '550')
-
-    #Barra de Menú
-    menuBar = Menu(frame)
+#------------------------------------------------------------------- Barra de Menú ----------------------------------------------------------
+    menuBar = Menu(app, bg='#333A3B')
     app.config(menu=menuBar)
 
     #Menú Archvio
-    archivoMenu = Menu(menuBar, tearoff=0)
+    archivoMenu = Menu(menuBar, tearoff=0, bg='#333A3B', fg='#FFFFFF')
     archivoMenu.add_command(label='Cargar')
     archivoMenu.add_separator()
-    archivoMenu.add_command(label='Salir')
+    archivoMenu.add_command(label='Salir', command= app.quit)
 
     #Menú Analizar
-    analisisMenu = Menu(menuBar, tearoff=0)
+    analisisMenu = Menu(menuBar, tearoff=0, bg='#333A3B', fg='#FFFFFF')
     analisisMenu.add_command(label='Analizar Archivo')
 
     #Menú Reportes
-    reporteMenu = Menu(menuBar, tearoff=0)
+    reporteMenu = Menu(menuBar, tearoff=0, bg='#333A3B', fg='#FFFFFF')
     reporteMenu.add_command(label='Tokens')
     reporteMenu.add_command(label='Errores')
     reporteMenu.add_command(label='Árbol de Derivación')
@@ -51,5 +48,37 @@ if __name__ == '__main__':
     menuBar.add_cascade(label='Archivo', menu=archivoMenu)
     menuBar.add_cascade(label='Análisis', menu=analisisMenu)
     menuBar.add_cascade(label='Generar Reporte', menu=reporteMenu)
+
+#------------------------------------------------------------------------ Frame -----------------------------------------------------------
+    #Frame Principal
+    frame = Frame(app)
+    frame.config(bg='#333A3B', padx=25)
+    frame.pack(fill='both', expand = True)
+    frame.pack_propagate(False)
+
+    #Frames Contenedores
+    frame1 = Frame(frame, width=460, height=550)
+    frame2 = Frame(frame, width=460, height=550)
+    frame1.pack_propagate(False)
+    frame2.pack_propagate(False)
+    frame1.pack(side = LEFT)
+    frame2.pack(side = RIGHT)
+
+    #Área de edición
+    seccion1 = Label(frame1, text='EDITOR')
+    seccion1.pack()
+    editor = Text(frame1, width=50, height=30)
+    editor.config(padx=10, pady=10, bd=0, bg='#000000', fg='#FFFFFF', selectbackground="#333A3B", insertbackground="#FFFFFF", font=("Consolas", 12))
+    editor.pack_propagate(False)
+    editor.pack()
+
+    #Consola
+    seccion2 = Label(frame2, text='CONSOLA')
+    seccion2.pack()
+    consola = Text(frame2, width=50, height=30)
+    consola.insert(1.0, 'Hola Mundo, esta es la consola del programa.')
+    consola.config(state='disabled', padx=10, pady=10, bd=0, bg='#000000', fg ='#08AEF5', selectbackground="#333A3B", font=("Consolas", 12))
+    consola.pack()
+
 
     app.mainloop()
