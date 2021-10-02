@@ -1,7 +1,8 @@
 from tkinter import *
 from tkinter import filedialog, messagebox
 
-doc =''
+from analisis import automata
+doc ='' #Variable que almacena 
 editor = '' #El área de edición de la ventana principal
 
 def abrirFile():
@@ -30,6 +31,22 @@ def abrirFile():
         messagebox.showinfo(message="El archivo se cargó correctamente.", title="Carga de Archivo")  
         #Agrega el cotenido del archivo nuevo.
         editor.insert(1.0, doc)
+
+#El contenido del editor lo manda al autómata
+def getContenido():
+    global editor
+    doc = editor.get(1.0, END)
+    if len(doc)>0 and doc != '' and doc != '\n' and doc != '\t' and doc is not None:
+        automata(doc)
+    else:
+        messagebox.showwarning(message='No hay datos para analizar', title='Analizar Archivo')
+
+def salir():
+    respuesta = messagebox.askyesno(message="¿Está seguro de cerrar el programa?", title="Salir")
+    if respuesta == YES:
+        app.destroy()
+    else:
+        pass
 
 if __name__ == '__main__':
 
@@ -60,11 +77,11 @@ if __name__ == '__main__':
     archivoMenu = Menu(menuBar, tearoff=0, bg='#333A3B', fg='#FFFFFF')
     archivoMenu.add_command(label='Abrir', command=lambda:abrirFile())
     archivoMenu.add_separator()
-    archivoMenu.add_command(label='Salir', command=app.quit)
+    archivoMenu.add_command(label='Salir', command=lambda:salir())
 
     #Menú Analizar
     analisisMenu = Menu(menuBar, tearoff=0, bg='#333A3B', fg='#FFFFFF')
-    analisisMenu.add_command(label='Analizar Archivo')
+    analisisMenu.add_command(label='Analizar Archivo', command=lambda:getContenido())
 
     #Menú Reportes
     reporteMenu = Menu(menuBar, tearoff=0, bg='#333A3B', fg='#FFFFFF')
