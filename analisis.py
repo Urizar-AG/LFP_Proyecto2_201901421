@@ -29,7 +29,21 @@ def isSimbolo(c):
     else:
         return False
 
+def isReservada(palabra):
+    for elemento in reservadas:
+        if palabra == elemento:
+            return 1
+        elif palabra.lower() == elemento:
+            return 2
+    return 0
+
 def automata(doc):
+    global listado
+    global tokens
+    global errores
+    listado = []
+    tokens = []
+    errores = []
 
     datos = doc + '~'
     estado = 0
@@ -365,4 +379,175 @@ def automata(doc):
             continue
         
         columna += 1
-        
+    tokenizar()
+
+#Identifica los token y busca errores
+def tokenizar():
+    for elemento in listado:
+        #Reservada correcta
+        if isReservada(elemento[0]) == 1:
+            #item = [elemento[0], tipo de token, fila, columna]
+            item = [elemento[0], 'Palabra Reservada', str(elemento[1]), str(elemento[2])]
+            tokens.append(item)
+        #Reservada pero lexicamente mal
+        elif isReservada(elemento[0]) == 2:
+            item = [elemento[0], 'Identificador', str(elemento[1]), str(elemento[2])]
+            tokens.append(item)       
+            #errores = [lexema encontrado, caracter esperado, fila, columna]
+            aux = [elemento[0], 'Se esperaba una palabra reservada', 'Lexico', elemento[1], elemento[2]]
+            errores.append(aux)
+        else:
+            for c in elemento[0]:
+                #Comilla -> Cadena
+                if ord(c) == 34:
+                    item = [elemento[0], 'Cadena', str(elemento[1]), str(elemento[2])]
+                    tokens.append(item)
+                    break
+                #Número con signo
+                elif ord(c) == 43 or ord(c) == 45:
+                    lexema = elemento[0]
+                    if len(lexema) >= 3:
+                        decimal = False
+                        #Signo negativo
+                        if ord(c) == 45:
+                            for i in range(len(lexema)):
+                                #Encontro decimal
+                                if ord(lexema[i]) == 46:
+                                    decimal = True
+                                    try:
+                                        if isNumero(lexema[i-1]) and isNumero(lexema[i+1]):
+                                            item = [elemento[0], 'Número Decimal', str(elemento[1]), str(elemento[2])]
+                                            tokens.append(item)  
+                                            break
+                                        else:
+                                            aux = [elemento[0], 'Se esperaba un número decimal', 'Lexico', elemento[1], elemento[2]]
+                                            errores.append(aux)
+                                            break
+                                    except:
+                                        aux = [elemento[0], 'Se esperaba un número decimal', 'Lexico', elemento[1], elemento[2]]
+                                        errores.append(aux)
+                                        break
+                        #Signo Positivo
+                        elif ord(c) == 43:
+                            numero = ''
+                            for i in range(len(lexema)):
+                                if ord(lexema[i]) == 46:
+                                    decimal = True
+                                    try:
+                                        if isNumero(lexema[i-1]) and isNumero(lexema[i+1]):
+                                            for caracter in lexema:
+                                                if ord(caracter) == 43:
+                                                    pass
+                                                else:
+                                                    numero += caracter
+                                            item = [numero, 'Número Decimal', str(elemento[1]), str(elemento[2])]
+                                            tokens.append(item)  
+                                            break
+                                        else:
+                                            aux = [elemento[0], 'Se esperaba un número decimal', 'Lexico', elemento[1], elemento[2]]
+                                            errores.append(aux)
+                                            break
+                                    except:
+                                        aux = [elemento[0], 'Se esperaba un número decimal', 'Lexico', elemento[1], elemento[2]]
+                                        errores.append(aux)
+                                        break
+                        #Si no encontro decimal
+                        if decimal == False:
+                            if ord(c) == 45:
+                                item = [elemento[0], 'Número Entero', str(elemento[1]), str(elemento[2])]
+                                tokens.append(item)  
+                                break
+                            elif ord(c) == 43:
+                                numero = ''
+                                for character in lexema:
+                                    if ord(character) != 43:
+                                        numero += character
+                                item = [numero,  'Número Entero', str(elemento[1]), str(elemento[2])]
+                                tokens.append(item)
+                                break
+                    elif len(lexema) == 2:
+                        if ord(c) == 45:
+                            item = [elemento[0], 'Número Entero', str(elemento[1]), str(elemento[2])]
+                            tokens.append(item)  
+                            break
+                        elif ord(c) == 43:
+                            numero = ''
+                            for character in lexema:
+                                if ord(character) != 43:
+                                    numero += character
+                            item = [numero, 'Número Entero', str(elemento[1]), str(elemento[2])]
+                            tokens.append(item)  
+                            break 
+                    else:
+                        if ord(c) == 45:
+                            item = [elemento[0], 'Número Entero', str(elemento[1]), str(elemento[2])]
+                            tokens.append(item)  
+                            break
+                        elif ord(c) == 43:
+                            numero = ''
+                            for character in lexema:
+                                if ord(character) != 43:
+                                    numero += character
+                            item = [numero, 'Número Entero', str(elemento[1]), str(elemento[2])]
+                            tokens.append(item)  
+                            break
+                    break                         
+                #Número sin signo
+                elif isNumero(c):
+                    lexema = elemento[0]
+                    #Número decimal correcto se compone almenos de 3 caracteres
+                    if len(lexema) >= 3:
+                        decimal = False
+                        for i in range(len(lexema)):
+                            #Si encuentra punto
+                            if ord(lexema[i]) == 46:
+                                decimal = True
+                                try:
+                                    #Posicion anterior y siguiente sean número
+                                    if isNumero(lexema[i-1]) and isNumero(lexema[i+1]):
+                                        item = [elemento[0], 'Número Decimal', str(elemento[1]), str(elemento[2])]
+                                        tokens.append(item)  
+                                        break
+                                    else:
+                                        aux = [elemento[0], 'Se esperaba un número decimal', 'Lexico', elemento[1], elemento[2]]
+                                        errores.append(aux)
+                                        break
+                                except:
+                                    aux = [elemento[0], 'Se esperaba un número decimal', 'Lexico', elemento[1], elemento[2]]
+                                    errores.append(aux)
+                                    break
+                        if decimal == False:
+                            item = [elemento[0], 'Número Entero', str(elemento[1]), str(elemento[2])]
+                            tokens.append(item)  
+                            break    
+                    else:
+                        decimal = False
+                        for c in lexema:
+                            if ord(c) == 46:
+                                decimal = True
+                                break
+                        if decimal == False:
+                            item = [elemento[0], 'Número Entero', str(elemento[1]), str(elemento[2])]
+                            tokens.append(item)  
+                            break
+                        elif decimal == True:
+                            aux = [elemento[0], 'Se esperaba un número entero', 'Lexico', elemento[1], elemento[2]]
+                            errores.append(aux)
+                            break   
+                    break
+                elif isSimbolo(c):
+                    item = [elemento[0], 'Símbolo', str(elemento[1]), str(elemento[2])]
+                    tokens.append(item)  
+                    break  
+                else:
+                    if ord(c) == 39:
+                        pass
+                    elif ord(c) == 35:
+                        pass
+                    else:
+                        aux = [elemento[0], 'Caracteres Inesperados', 'Lexico', elemento[1], elemento[2]]
+                        errores.append(aux)                        
+                break 
+    #print(tokens)
+    #print('############################')
+    #print(errores)
