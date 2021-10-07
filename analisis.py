@@ -1,3 +1,5 @@
+from reportes import reporteT
+
 reservadas = ['Claves', 'Registros', 'imprimir', 'imprimirln', 'conteo', 'promedio',
               'contarsi', 'datos', 'sumar', 'max', 'min', 'exportarReporte']
 
@@ -380,6 +382,10 @@ def automata(doc):
         
         columna += 1
     tokenizar()
+    if len(tokens) > 0 and len(errores) == 0:
+        return True
+    else:
+        return False
 
 #Identifica los token y busca errores
 def tokenizar():
@@ -551,3 +557,6 @@ def tokenizar():
     #print(tokens)
     #print('############################')
     #print(errores)
+
+def generarReporteTokens():
+    reporteT(tokens)

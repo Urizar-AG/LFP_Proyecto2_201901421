@@ -1,7 +1,7 @@
 from tkinter import *
 from tkinter import filedialog, messagebox
 
-from analisis import automata
+from analisis import automata, generarReporteTokens
 doc ='' #Variable que almacena 
 editor = '' #El área de edición de la ventana principal
 existenTokens = False
@@ -57,6 +57,7 @@ def getCodigo():
 def getReporteTokens():
     global existenTokens
     if existenTokens == True:
+        generarReporteTokens()
         messagebox.showinfo(message='Reporte de Tokens generado exitosamente.', title='Reporte Tokens')
     else:
         messagebox.showerror(message='No hay datos que reportar', title='Reporte Tokens')
