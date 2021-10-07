@@ -1,4 +1,4 @@
-from reportes import reporteT
+from reportes import reporteT, reporteE
 
 reservadas = ['Claves', 'Registros', 'imprimir', 'imprimirln', 'conteo', 'promedio',
               'contarsi', 'datos', 'sumar', 'max', 'min', 'exportarReporte']
@@ -84,7 +84,7 @@ def automata(doc):
                     pass
                 else:
                     #errores = [lexema encontrado, caracter esperado, fila, columna]
-                    aux = [c, 'Caracteres Inesperado', 'Lexico', fila, columna - (len(lex) - 1)]
+                    aux = [c, 'Caracteres Inesperado', 'Léxico', fila, columna - (len(lex) - 1)]
                     errores.append(aux)
                 lex = ''
                 estado = 0
@@ -132,7 +132,7 @@ def automata(doc):
                     estado = 7
                 else:
                    #errores = [lexema, caracter esperado, fila, columna]
-                    aux = [c, 'Caracter Inesperado', 'Lexico', fila, columna - (len(lex) - 1)]
+                    aux = [c, 'Caracter Inesperado', 'Léxico', fila, columna - (len(lex) - 1)]
                     errores.append(aux)
         elif estado == 2:
             if isNumero(c):
@@ -143,7 +143,7 @@ def automata(doc):
                     pass
                 else:
                     #errores = [token encontrado, token esperado, fila, columna]
-                    aux = [c, 'Caracteres Inesperado', 'Lexico', fila, columna - (len(lex) - 1)]
+                    aux = [c, 'Caracteres Inesperado', 'Léxico', fila, columna - (len(lex) - 1)]
                     errores.append(aux)
                 lex = ''
                 estado = 0
@@ -187,7 +187,7 @@ def automata(doc):
                     estado = 7
                 else:
                     #errores = [token encontrado, token esperado, fila, columna]
-                    aux = [c, 'Caracteres Inesperado', 'Lexico', fila, columna - (len(lex) - 1)]
+                    aux = [c, 'Caracteres Inesperado', 'Léxico', fila, columna - (len(lex) - 1)]
                     errores.append(aux)
         elif estado == 4:
             if ord(c) == 34:
@@ -229,7 +229,7 @@ def automata(doc):
                 estado = 7
             else:
                 #errores = [token encontrado, token esperado, fila, columna]
-                aux = [c, 'Caracteres Inesperado', 'Lexico', fila, columna - (len(lex) - 1)]
+                aux = [c, 'Caracteres Inesperado', 'Léxico', fila, columna - (len(lex) - 1)]
                 errores.append(aux)
         elif estado == 6:
             if ord(c) != 10:
@@ -268,7 +268,7 @@ def automata(doc):
                     estado = 7
                 else:
                     #errores = [token encontrado, token esperado, fila, columna]
-                    aux = [c, 'Caracteres Inesperado', 'Lexico', fila, columna - (len(lex) - 1)]
+                    aux = [c, 'Caracteres Inesperado', 'Léxico', fila, columna - (len(lex) - 1)]
                     errores.append(aux)
         elif estado == 7:
             if ord(c) == 39:
@@ -279,7 +279,7 @@ def automata(doc):
                     pass
                 else:
                     #errores = [token encontrado, token esperado, fila, columna]
-                    aux = [c, 'Caracteres Inesperado', 'Lexico', fila, columna - (len(lex) - 1)]
+                    aux = [c, 'Caracteres Inesperado', 'Léxico', fila, columna - (len(lex) - 1)]
                     errores.append(aux)
                 lex = ''
                 estado = 0
@@ -319,7 +319,7 @@ def automata(doc):
                     estado = 7
                 else:
                     #errores = [token encontrado, token esperado, fila, columna]
-                    aux = [c, 'Caracteres Inesperado', 'Lexico', fila, columna - (len(lex) - 1)]
+                    aux = [c, 'Caracteres Inesperado', 'Léxico', fila, columna - (len(lex) - 1)]
                     errores.append(aux)
         elif estado == 9:
             if ord(c) == 39:
@@ -329,7 +329,7 @@ def automata(doc):
                 if ord(c) == 32 or ord(c) == 10 or ord(c) == 9 or c == '~':
                     pass
                 else:
-                    aux = [c, 'Caracteres Inesperado', 'Lexico', fila, columna - (len(lex) - 1)]
+                    aux = [c, 'Caracteres Inesperado', 'Léxico', fila, columna - (len(lex) - 1)]
                     errores.append(aux)
                     lex = ''
                     estado = 0
@@ -348,7 +348,7 @@ def automata(doc):
                 if ord(c) == 32 or ord(c) == 10 or ord(c) == 9 or c == '~':
                     pass
                 else:
-                    aux = [c, 'Caracteres Inesperado', 'Lexico', fila, columna - (len(lex) - 1)]
+                    aux = [c, 'Caracteres Inesperado', 'Léxico', fila, columna - (len(lex) - 1)]
                     errores.append(aux)
                 lex = ''
                 estado = 0
@@ -360,7 +360,7 @@ def automata(doc):
                 if ord(c) == 32 or ord(c) == 10 or ord(c) == 9 or c == '~':
                     pass
                 else:
-                    aux = [c, 'Caracteres Inesperado', 'Lexico', fila, columna - (len(lex) - 1)]
+                    aux = [c, 'Caracteres Inesperado', 'Léxico', fila, columna - (len(lex) - 1)]
                     errores.append(aux)
                 lex = ''
                 estado = 0
@@ -400,7 +400,7 @@ def tokenizar():
             item = [elemento[0], 'Identificador', str(elemento[1]), str(elemento[2])]
             tokens.append(item)       
             #errores = [lexema encontrado, caracter esperado, fila, columna]
-            aux = [elemento[0], 'Se esperaba una palabra reservada', 'Lexico', elemento[1], elemento[2]]
+            aux = [elemento[0], 'Se esperaba una palabra reservada', 'Léxico', elemento[1], elemento[2]]
             errores.append(aux)
         else:
             for c in elemento[0]:
@@ -426,11 +426,11 @@ def tokenizar():
                                             tokens.append(item)  
                                             break
                                         else:
-                                            aux = [elemento[0], 'Se esperaba un número decimal', 'Lexico', elemento[1], elemento[2]]
+                                            aux = [elemento[0], 'Se esperaba un número decimal', 'Léxico', elemento[1], elemento[2]]
                                             errores.append(aux)
                                             break
                                     except:
-                                        aux = [elemento[0], 'Se esperaba un número decimal', 'Lexico', elemento[1], elemento[2]]
+                                        aux = [elemento[0], 'Se esperaba un número decimal', 'Léxico', elemento[1], elemento[2]]
                                         errores.append(aux)
                                         break
                         #Signo Positivo
@@ -450,11 +450,11 @@ def tokenizar():
                                             tokens.append(item)  
                                             break
                                         else:
-                                            aux = [elemento[0], 'Se esperaba un número decimal', 'Lexico', elemento[1], elemento[2]]
+                                            aux = [elemento[0], 'Se esperaba un número decimal', 'Léxico', elemento[1], elemento[2]]
                                             errores.append(aux)
                                             break
                                     except:
-                                        aux = [elemento[0], 'Se esperaba un número decimal', 'Lexico', elemento[1], elemento[2]]
+                                        aux = [elemento[0], 'Se esperaba un número decimal', 'Léxico', elemento[1], elemento[2]]
                                         errores.append(aux)
                                         break
                         #Si no encontro decimal
@@ -515,11 +515,11 @@ def tokenizar():
                                         tokens.append(item)  
                                         break
                                     else:
-                                        aux = [elemento[0], 'Se esperaba un número decimal', 'Lexico', elemento[1], elemento[2]]
+                                        aux = [elemento[0], 'Se esperaba un número decimal', 'Léxico', elemento[1], elemento[2]]
                                         errores.append(aux)
                                         break
                                 except:
-                                    aux = [elemento[0], 'Se esperaba un número decimal', 'Lexico', elemento[1], elemento[2]]
+                                    aux = [elemento[0], 'Se esperaba un número decimal', 'Léxico', elemento[1], elemento[2]]
                                     errores.append(aux)
                                     break
                         if decimal == False:
@@ -537,7 +537,7 @@ def tokenizar():
                             tokens.append(item)  
                             break
                         elif decimal == True:
-                            aux = [elemento[0], 'Se esperaba un número entero', 'Lexico', elemento[1], elemento[2]]
+                            aux = [elemento[0], 'Se esperaba un número decimal', 'Léxico', elemento[1], elemento[2]]
                             errores.append(aux)
                             break   
                     break
@@ -551,7 +551,7 @@ def tokenizar():
                     elif ord(c) == 35:
                         pass
                     else:
-                        aux = [elemento[0], 'Caracteres Inesperados', 'Lexico', elemento[1], elemento[2]]
+                        aux = [elemento[0], 'Caracteres Inesperados', 'Léxico', elemento[1], elemento[2]]
                         errores.append(aux)                        
                 break 
     #print(tokens)
@@ -560,3 +560,6 @@ def tokenizar():
 
 def generarReporteTokens():
     reporteT(tokens)
+
+def generarReporteErrores():
+    reporteE(errores)
