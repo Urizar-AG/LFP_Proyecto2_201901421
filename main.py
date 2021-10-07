@@ -4,6 +4,9 @@ from tkinter import filedialog, messagebox
 from analisis import automata
 doc ='' #Variable que almacena 
 editor = '' #El área de edición de la ventana principal
+existenTokens = False
+existenErrores = False
+
 
 def abrirFile():
     global doc
@@ -33,13 +36,37 @@ def abrirFile():
         editor.insert(1.0, doc)
 
 #El contenido del editor lo manda al autómata
-def getContenido():
+def getCodigo():
     global editor
+    global existenTokens
+    global existenErrores
     doc = editor.get(1.0, END)
     if len(doc)>0 and doc != '' and doc != '\n' and doc != '\t' and doc is not None:
-        automata(doc)
+        resultado = automata(doc)
+        if resultado == True:
+            existenTokens = True
+            existenErrores = False
+            messagebox.showinfo(message='Análisis exitoso', title='Analizar Archivo')
+        else:
+            existenTokens = True
+            existenErrores = True
+            messagebox.showwarning(message='Se encontraron algunos errores, corrige el archivo de entrada.', title='Analizar Archivo')
     else:
         messagebox.showwarning(message='No hay datos para analizar', title='Analizar Archivo')
+
+def getReporteTokens():
+    global existenTokens
+    if existenTokens == True:
+        messagebox.showinfo(message='Reporte de Tokens generado exitosamente.', title='Reporte Tokens')
+    else:
+        messagebox.showerror(message='No hay datos que reportar', title='Reporte Tokens')
+
+def getReporteErrores():
+    global existenErrores
+    if existenErrores == True:
+        messagebox.showinfo(message='Reporte de Errores generado exitosamente', title='Reporte Errores')
+    else:
+        messagebox.showerror(message='No hay errores que reportar', title='Reporte Errores')
 
 def salir():
     respuesta = messagebox.askyesno(message="¿Está seguro de cerrar el programa?", title="Salir")
@@ -81,12 +108,12 @@ if __name__ == '__main__':
 
     #Menú Analizar
     analisisMenu = Menu(menuBar, tearoff=0, bg='#333A3B', fg='#FFFFFF')
-    analisisMenu.add_command(label='Analizar Archivo', command=lambda:getContenido())
+    analisisMenu.add_command(label='Analizar Archivo', command=lambda:getCodigo())
 
     #Menú Reportes
     reporteMenu = Menu(menuBar, tearoff=0, bg='#333A3B', fg='#FFFFFF')
-    reporteMenu.add_command(label='Tokens')
-    reporteMenu.add_command(label='Errores')
+    reporteMenu.add_command(label='Tokens', command=lambda:getReporteTokens())
+    reporteMenu.add_command(label='Errores', command=lambda:getReporteErrores())
     reporteMenu.add_command(label='Árbol de Derivación')
 
     #Añadiendo las opciones a la barra del menú.
