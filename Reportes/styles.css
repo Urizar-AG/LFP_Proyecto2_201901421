@@ -1,0 +1,97 @@
+body{
+    display: flex;
+    height: 97vh;
+    background-color: #000000;
+}
+
+#contenedor {
+    display:grid;
+    grid-template-rows: 15% 265%;
+    row-gap: 2%;
+    grid-template-columns: 100%;
+    width: 100%;
+}
+
+#encabezado {
+    display: grid;
+    grid-template-columns: 8% 92%;
+    grid-template-rows: 100%;
+    border: solid 5px #ffffff;
+}
+
+#encabezado-logo {
+    background-image: url('../Icono.png');
+    background-size: 100% 100%;
+}
+
+#encabezado-texto {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: #ffffff;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+}
+
+#cuerpo {
+    width: 100%;
+    height: 30%;
+}
+
+#tabla {
+    display: flex;
+    width: 80%;
+    height: 100%;
+    border: solid 5px #ffffff;
+    border-radius: 10px;
+    justify-content: center;
+    margin: 0 auto;
+    overflow: scroll;
+}
+
+#tabla table {
+    width: 100%;
+    height: 90%;
+    border-collapse: collapse;
+    text-align: center;
+    color: #ffffff;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: large;
+}
+
+#tabla thead {
+    /*thead fijo mientras se hace scroll*/
+    position: -webkit-sticky; /* for Safari */
+    position: sticky;
+    top: 0;
+    color: #ffffff;
+    background-color: #08AEF5;
+}
+
+#tabla th,td{
+    padding: 10px;
+}
+
+#tabla tr:nth-child(even) {
+    background-color: #333A3B;
+}
+
+#tabla::-webkit-scrollbar {
+    -webkit-appearance: none;
+}
+
+#tabla::-webkit-scrollbar-corner {
+    display: none;
+}
+
+#tabla::-webkit-scrollbar-thumb:vertical {
+    border-radius: 5px;
+    background-color: #08AEF5;
+
+}
+
+/*Scrollbar Horizontal en caso aparezca*/
+#tabla::-webkit-scrollbar-thumb:horizontal {
+    border-radius: 5px;
+    background-color: #08AEF5;
+}

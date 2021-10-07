@@ -1,5 +1,6 @@
 from tkinter import *
 from tkinter import filedialog, messagebox
+from os import system, startfile
 
 from analisis import automata, generarReporteTokens, generarReporteErrores
 doc ='' #Variable que almacena 
@@ -59,6 +60,7 @@ def getReporteTokens():
     if existenTokens == True:
         generarReporteTokens()
         messagebox.showinfo(message='Reporte de Tokens generado exitosamente.', title='Reporte Tokens')
+        startfile('Reportes\\ReporteTokens.html')
     else:
         messagebox.showerror(message='No hay datos que reportar', title='Reporte Tokens')
 
@@ -67,6 +69,7 @@ def getReporteErrores():
     if existenErrores == True:
         generarReporteErrores()
         messagebox.showinfo(message='Reporte de Errores generado exitosamente', title='Reporte Errores')
+        startfile('Reportes\\ReporteErrores.html')
     else:
         messagebox.showerror(message='No hay errores que reportar', title='Reporte Errores')
 
