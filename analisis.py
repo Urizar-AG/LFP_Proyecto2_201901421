@@ -6,7 +6,8 @@ reservadas = ['Claves', 'Registros', 'imprimir', 'imprimirln', 'conteo', 'promed
 listado = [] #Listado de Lexemas reconocidos en la lectura.
 tokens = [] #Listado de Tokens
 errores = [] #Listado de Errores
-
+pila = []#Pila para manejar los tokens en el parser.
+listadoClaves = []  #Guarda las claves al reconocerlas en el parser.
 
 #Convierte a ascii y verifica si corresponde a algún caracter.
 def isLetra(c):
@@ -38,6 +39,13 @@ def isReservada(palabra):
         elif palabra.lower() == elemento:
             return 2
     return 0
+
+def quitarComillas(cadena):
+    nuevaCadena = ''
+    for c in cadena:
+        if c != '"':
+            nuevaCadena += c
+    return nuevaCadena
 
 def automata(doc):
     global listado
@@ -554,6 +562,7 @@ def tokenizar():
                         aux = [elemento[0], 'Caracteres Inesperados', 'Léxico', elemento[1], elemento[2]]
                         errores.append(aux)                        
                 break 
+    parser()
     #print(tokens)
     #print('############################')
     #print(errores)
@@ -563,3 +572,114 @@ def generarReporteTokens():
 
 def generarReporteErrores():
     reporteE(errores)
+
+def parser():
+    for elemento in tokens:
+        pila.append(elemento)
+    validarCLAVES()
+    #print(listadoClaves)
+
+
+def validarCLAVES():
+ 
+    if pila[0][1] == 'Palabra Reservada':
+        if pila[0][0] == 'Claves':
+            pila.pop(0)
+    else:
+        #errores = [lexema encontrado, caracter esperado, fila, columna]
+        aux = [pila[0][0], 'Se esperaba palabra reservada', 'Sintáctico', pila[0][2], pila[0][3]]
+        errores.append(aux)
+        pila.pop(0)
+    validarSimboloIgual('RClaves')
+
+def validarSimboloIgual(parametro):
+    if pila[0][0] == '=':
+        pila.pop(0)
+    else:
+        aux = [pila[0][0], 'Se esperaba el símbolo =', 'Sintáctico', pila[0][2], pila[0][3]]
+        errores.append(aux)        
+        pila.pop(0)
+    validarCorchete(parametro, 'a')
+
+def validarCorchete(parametro, modo):
+    if parametro == 'RClaves':
+        if modo == 'a':
+            if pila[0][0] == '[':
+                pila.pop(0)
+            else:
+                aux = [pila[0][0], 'Se esperaba el símbolo [', 'Sintáctico', pila[0][2], pila[0][3]]
+                errores.append(aux)        
+                pila.pop(0)
+
+            validarLClaves()
+        elif modo == 'c':
+            if pila[0][0] == ']':
+                return True
+            else:
+                #aux = [pila[0][0], 'Se esperaba el símbolo ]', 'Sintáctico', pila[0][2], pila[0][3]]
+                #errores.append(aux)        
+                #pila.pop(0)
+                return False
+
+def validarLClaves():
+    if pila[0][1] == "Cadena":
+        listadoClaves.append(quitarComillas(pila[0][0]))
+        pila.pop(0)
+    else:
+        aux = [pila[0][0], 'Se esperaba una clave', 'Sintáctico', pila[0][2], pila[0][3]]
+        errores.append(aux)        
+        pila.pop(0) 
+    validarLClaveP()
+
+def validarLClaveP():
+    if pila[0][0] == ',':
+        pila.pop(0)
+        res0 =  validarTkCadena()
+        if res0 == True:
+            pila.pop(0)
+            validarLClaveP()
+        else:
+            res1 = validarCorchete('RClaves', 'c')
+            if res1 == True:
+                aux = [pila[0][0], 'Se esperaba cadena', 'Sintáctico', pila[0][2], pila[0][3]]
+                errores.append(aux)        
+                pila.pop(0)
+            else:
+                if pila[0][0] == ',':
+                    aux = [pila[0][0], 'Se esperaba cadena', 'Sintáctico', pila[0][2], pila[0][3]]
+                    errores.append(aux)        
+                    pila.pop(0)
+                    validarLClaveP()
+                else:
+                    aux = [pila[0][0], 'Se esperaba el símbolo ,', 'Sintáctico', pila[0][2], pila[0][3]]
+                    errores.append(aux)        
+                    pila.pop(0)
+                    validarLClaveP()
+
+    else:
+        res0 = validarTkCadena()
+        if res0 == True:
+            aux = [pila[0][0], 'Se esperaba el símbolo ,', 'Sintáctico', pila[0][2], pila[0][3]]
+            errores.append(aux)        
+            pila.pop(0)
+            validarLClaveP()
+        else:
+            res1 = validarCorchete('RClaves', 'c')
+            if res1 != True:
+                aux = [pila[0][0], 'Error inesperado', 'Sintáctico', pila[0][2], pila[0][3]]
+                errores.append(aux)        
+                pila.pop(0)
+                validarLClaveP()
+            else:
+                pila.pop(0)
+                
+def validarTkCadena():
+    if pila[0][1] == 'Cadena':
+        listadoClaves.append(quitarComillas(pila[0][0]))
+        #pila.pop(0)
+        return True
+    else:
+        #aux = [pila[0][0], 'Se esperaba cadena', 'Sintáctico', pila[0][2], pila[0][3]]
+        #errores.append(aux)        
+        #pila.pop(0)
+        return False
