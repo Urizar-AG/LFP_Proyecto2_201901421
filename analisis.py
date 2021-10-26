@@ -42,12 +42,18 @@ def isReservada(palabra):
             return 2
     return 0
 
-def quitarComillas(cadena):
-    nuevaCadena = ''
-    for c in cadena:
-        if c != '"':
-            nuevaCadena += c
-    return nuevaCadena
+#convierte los números a int\float y quita las comillas dobles de las cadenas
+def darFormato(entrada, tipo):
+    if tipo == 'Cadena':
+        nuevaCadena = ''
+        for c in entrada:
+            if c != '"':
+                nuevaCadena += c
+        return nuevaCadena
+    elif tipo == 'Número Entero':
+        return int(entrada)
+    elif tipo == 'Número Decimal':
+        return float(entrada)
 
 def automata(doc):
     global listado
@@ -653,7 +659,7 @@ def validarCorchete(parametro, modo):
 
 def validarLClaves():
     if pila[0][1] == "Cadena":
-        listadoClaves.append(quitarComillas(pila[0][0]))
+        listadoClaves.append(darFormato(pila[0][0],pila[0][1]))
         pila.pop(0)
     else:
         aux = [pila[0][0], 'Se esperaba una clave', 'Sintáctico', pila[0][2], pila[0][3]]
@@ -704,7 +710,7 @@ def validarLClaveP():
 
 def validarTkCadena():
     if pila[0][1] == 'Cadena':
-        listadoClaves.append(quitarComillas(pila[0][0]))
+        listadoClaves.append(darFormato(pila[0][0], pila[0][1]))
         #pila.pop(0)
         return True
     else:
@@ -745,7 +751,7 @@ def validarRegistro():
                 if res1 == True:
                     aux = [pila[0][0], 'Se esperaba el símbolo {', 'Sintáctico', pila[0][2], pila[0][3]]
                     errores.append(aux)
-                    registrar.append(pila[0][0])        
+                    registrar.append(darFormato(pila[0][0],pila[0][1]))        
                     pila.pop(0)
                     validarLERegistroP()
                 else:
@@ -753,7 +759,6 @@ def validarRegistro():
                     errores.append(aux)
                     pila.pop(0)
                     validarRegistro()
-
 
 def validarSimboloLlave(modo):
     if modo == 'a':
@@ -767,19 +772,19 @@ def validarSimboloLlave(modo):
         else:
             return False
 
-
 def validarLERegistro():
     global registrar
     res = validarElementoRegistro()
     if res == True:
-        registrar.append(pila[0][0])
+        registrar.append(darFormato(pila[0][0], pila[0][1]))
         pila.pop(0)
         validarLERegistroP()
     else:
         res = validarSimboloLlave('c')
         if res == True:
             pila.pop(0)
-            listadoRegistros.append(registrar)
+            if len(registrar) == len(listadoClaves):
+                listadoRegistros.append(registrar)
             registrar = []
         else:
             if pila[0][0] == ',':
@@ -807,7 +812,7 @@ def validarLERegistroP():
         pila.pop(0)
         res = validarElementoRegistro()
         if res == True:
-            registrar.append(pila[0][0])
+            registrar.append(darFormato(pila[0][0], pila[0][1]))
             pila.pop(0)
             validarLERegistroP()
         else:
@@ -817,7 +822,8 @@ def validarLERegistroP():
                 errores.append(aux)        
                 pila.pop(0)
                 if len(registrar) > 0:
-                    listadoRegistros.append(registrar)
+                    if len(registrar) == len(listadoClaves):
+                        listadoRegistros.append(registrar)
                 registrar = []
                 validarLRegistros()
             else:
@@ -843,28 +849,32 @@ def validarLERegistroP():
                 res2 = validarSimboloLlave('a')
                 if res2 == True:
                     aux = [pila[0][0], 'Se esperaba el simbolo }', 'Sintáctico', pila[0][2], pila[0][3]]
-                    errores.append(aux)        
-                    listadoRegistros.append(registrar)
+                    errores.append(aux)
+                    if len(registrar) == len(listadoClaves):        
+                        listadoRegistros.append(registrar)
                     registrar = []
                     validarRegistro()
                 else:
                     if pila[1][0] == '~':
                         aux = [pila[0][0], 'Error inesperado', 'Sintáctico', pila[0][2], pila[0][3]]
                         errores.append(aux)
-                        listadoRegistros.append(registrar)
+                        if len(registrar) == len(listadoClaves):
+                            listadoRegistros.append(registrar)
                         registrar = []
                         pila.pop(0)
                     elif pila[1][1] == 'Palabra Reservada':
                         aux = [pila[0][0], 'Error inesperado', 'Sintáctico', pila[0][2], pila[0][3]]
-                        errores.append(aux)     
-                        listadoRegistros.append(registrar)
+                        errores.append(aux)
+                        if len(registrar) == len(listadoClaves):     
+                            listadoRegistros.append(registrar)
                         registrar = []   
                         pila.pop(0)
                         #validarLERegistroP()
                     elif pila[0][0] == ']':
                         aux = [pila[0][0], 'Se esperaba el símbolo }', 'Sintáctico', pila[0][2], pila[0][3]]
                         errores.append(aux) 
-                        listadoRegistros.append(registrar)
+                        if len(registrar) == len(listadoClaves):
+                            listadoRegistros.append(registrar)
                         registrar = []       
                         pila.pop(0)
                     else:
@@ -875,7 +885,7 @@ def validarLERegistroP():
                         validarLERegistroP()
             else:
                 pila.pop(0)
-                listadoRegistros.append(registrar)
-                #global reg 
+                if len(registrar) == len(listadoClaves):
+                    listadoRegistros.append(registrar)
                 registrar = []
                 validarRegistro()
