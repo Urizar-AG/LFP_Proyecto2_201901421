@@ -8,6 +8,8 @@ tokens = [] #Listado de Tokens
 errores = [] #Listado de Errores
 pila = []#Pila para manejar los tokens en el parser.
 listadoClaves = []  #Guarda las claves al reconocerlas en el parser.
+listadoRegistros = [] #Guarda los registros al reconocerlas en el parser.
+registrar = [] #Lista que almacena temporalmente un conjunto de registor {}
 
 #Convierte a ascii y verifica si corresponde a algún caracter.
 def isLetra(c):
@@ -576,9 +578,14 @@ def generarReporteErrores():
 def parser():
     for elemento in tokens:
         pila.append(elemento)
+    acep = ['~', 'Aceptacion', 'x', 'y']
+    pila.append(acep)
     validarCLAVES()
-    #print(listadoClaves)
-
+    validarREGISTROS()
+    #print(listadoRegistros)
+    print(errores)
+    print("----------------------------------------------------------")
+    print(listadoRegistros)
 
 def validarCLAVES():
  
@@ -590,16 +597,25 @@ def validarCLAVES():
         aux = [pila[0][0], 'Se esperaba palabra reservada', 'Sintáctico', pila[0][2], pila[0][3]]
         errores.append(aux)
         pila.pop(0)
-    validarSimboloIgual('RClaves')
+    validarSimboloIgual('RClaves', 'RClaves')
 
-def validarSimboloIgual(parametro):
-    if pila[0][0] == '=':
-        pila.pop(0)
-    else:
-        aux = [pila[0][0], 'Se esperaba el símbolo =', 'Sintáctico', pila[0][2], pila[0][3]]
-        errores.append(aux)        
-        pila.pop(0)
-    validarCorchete(parametro, 'a')
+def validarSimboloIgual(parametro, parametro2):
+    if parametro2 == 'RClaves':
+        if pila[0][0] == '=':
+            pila.pop(0)
+        else:
+            aux = [pila[0][0], 'Se esperaba el símbolo =', 'Sintáctico', pila[0][2], pila[0][3]]
+            errores.append(aux)        
+            pila.pop(0)
+        validarCorchete(parametro, 'a')
+    elif parametro2 == 'RRegistros':
+        if pila[0][0] == '=':
+            pila.pop(0)
+        else:
+            aux = [pila[0][0], 'Se esperaba el símbolo =', 'Sintáctico', pila[0][2], pila[0][3]]
+            errores.append(aux)        
+            pila.pop(0)
+        validarCorchete(parametro, 'a')
 
 def validarCorchete(parametro, modo):
     if parametro == 'RClaves':
@@ -619,6 +635,20 @@ def validarCorchete(parametro, modo):
                 #aux = [pila[0][0], 'Se esperaba el símbolo ]', 'Sintáctico', pila[0][2], pila[0][3]]
                 #errores.append(aux)        
                 #pila.pop(0)
+                return False
+    elif parametro == 'RRegistros':
+        if modo == 'a':
+            if pila[0][0] == '[':
+                pila.pop(0)
+            else:
+                aux = [pila[0][0], 'Se esperaba el símbolo [', 'Sintácticto', pila[0][2], pila[0][3]]
+                errores.append(aux)
+                pila.pop(0)
+            validarLRegistros()
+        elif modo == 'c':
+            if pila[0][0] == ']':
+                return True
+            else:
                 return False
 
 def validarLClaves():
@@ -655,7 +685,6 @@ def validarLClaveP():
                     errores.append(aux)        
                     pila.pop(0)
                     validarLClaveP()
-
     else:
         res0 = validarTkCadena()
         if res0 == True:
@@ -672,7 +701,7 @@ def validarLClaveP():
                 validarLClaveP()
             else:
                 pila.pop(0)
-                
+
 def validarTkCadena():
     if pila[0][1] == 'Cadena':
         listadoClaves.append(quitarComillas(pila[0][0]))
@@ -683,3 +712,170 @@ def validarTkCadena():
         #errores.append(aux)        
         #pila.pop(0)
         return False
+
+def validarREGISTROS():
+    if len(pila) > 0:
+        if pila[0][1] == 'Palabra Reservada':
+            if pila[0][0] == 'Registros':
+                pila.pop(0)
+        else:
+            #errores = [lexema encontrado, caracter esperado, fila, columna]
+            aux = [pila[0][0], 'Se esperaba palabra reservada', 'Sintáctico', pila[0][2], pila[0][3]]
+            errores.append(aux)
+            pila.pop(0)
+        validarSimboloIgual('RRegistros', 'RRegistros')        
+
+def validarLRegistros():
+    validarRegistro()
+
+def validarRegistro():
+    res = validarSimboloLlave('a')
+    if res == True:
+        pila.pop(0)
+        validarLERegistro()
+    else:
+        if pila[0][0] == '~':
+            pass
+        else:
+            res = validarCorchete('RRegistros', 'c')
+            if res == True:
+                pila.pop(0)
+            else:
+                res1 = validarElementoRegistro()
+                if res1 == True:
+                    aux = [pila[0][0], 'Se esperaba el símbolo {', 'Sintáctico', pila[0][2], pila[0][3]]
+                    errores.append(aux)
+                    registrar.append(pila[0][0])        
+                    pila.pop(0)
+                    validarLERegistroP()
+                else:
+                    aux = [pila[0][0], 'Error', 'Sintáctico', pila[0][2], pila[0][3]]
+                    errores.append(aux)
+                    pila.pop(0)
+                    validarRegistro()
+
+
+def validarSimboloLlave(modo):
+    if modo == 'a':
+        if pila[0][0] == '{':
+            return True
+        else: 
+            return False
+    elif modo == 'c':
+        if pila[0][0] == '}':
+            return True
+        else:
+            return False
+
+
+def validarLERegistro():
+    global registrar
+    res = validarElementoRegistro()
+    if res == True:
+        registrar.append(pila[0][0])
+        pila.pop(0)
+        validarLERegistroP()
+    else:
+        res = validarSimboloLlave('c')
+        if res == True:
+            pila.pop(0)
+            listadoRegistros.append(registrar)
+            registrar = []
+        else:
+            if pila[0][0] == ',':
+                aux = [pila[0][0], 'Se esperaba un elemento registro', 'Sintáctico', pila[0][2], pila[0][3]]
+                errores.append(aux)        
+                pila.pop(0)
+                validarLERegistro()
+            else:    
+                pass
+
+def validarElementoRegistro():
+    if pila[0][1] == 'Cadena':
+        return True
+    elif pila[0][1] == 'Número Entero':
+        return True
+    elif pila[0][1] == 'Número Decimal':
+        return True
+    else:
+        return False
+
+def validarLERegistroP():
+    global registrar
+    global listadoErrores
+    if pila[0][0] == ",":
+        pila.pop(0)
+        res = validarElementoRegistro()
+        if res == True:
+            registrar.append(pila[0][0])
+            pila.pop(0)
+            validarLERegistroP()
+        else:
+            res1 = validarSimboloLlave('c')
+            if res1 == True:
+                aux = [pila[0][0], 'Se esperaba un elemento registro', 'Sintáctico', pila[0][2], pila[0][3]]
+                errores.append(aux)        
+                pila.pop(0)
+                if len(registrar) > 0:
+                    listadoRegistros.append(registrar)
+                registrar = []
+                validarLRegistros()
+            else:
+                if pila[0][0] == ',':
+                    aux = [pila[0][0], 'Se esperaba un elemento registro', 'Sintáctico', pila[0][2], pila[0][3]]
+                    errores.append(aux)        
+                    pila.pop(0)
+                else:
+                    aux = [pila[0][0], 'Se esperaba el símbolo ,', 'Sintáctico', pila[0][2], pila[0][3]]
+                    errores.append(aux)        
+                    pila.pop(0)
+                validarLERegistroP()
+    else:
+        res0 = validarElementoRegistro()
+        if res0 == True:
+            aux = [pila[0][0], 'Se esperaba el símbolo ,', 'Sintáctico', pila[0][2], pila[0][3]]
+            errores.append(aux)        
+            pila.pop(0)
+            validarLERegistroP()
+        else:
+            res1 = validarSimboloLlave('c')
+            if res1 != True:
+                res2 = validarSimboloLlave('a')
+                if res2 == True:
+                    aux = [pila[0][0], 'Se esperaba el simbolo }', 'Sintáctico', pila[0][2], pila[0][3]]
+                    errores.append(aux)        
+                    listadoRegistros.append(registrar)
+                    registrar = []
+                    validarRegistro()
+                else:
+                    if pila[1][0] == '~':
+                        aux = [pila[0][0], 'Error inesperado', 'Sintáctico', pila[0][2], pila[0][3]]
+                        errores.append(aux)
+                        listadoRegistros.append(registrar)
+                        registrar = []
+                        pila.pop(0)
+                    elif pila[1][1] == 'Palabra Reservada':
+                        aux = [pila[0][0], 'Error inesperado', 'Sintáctico', pila[0][2], pila[0][3]]
+                        errores.append(aux)     
+                        listadoRegistros.append(registrar)
+                        registrar = []   
+                        pila.pop(0)
+                        #validarLERegistroP()
+                    elif pila[0][0] == ']':
+                        aux = [pila[0][0], 'Se esperaba el símbolo }', 'Sintáctico', pila[0][2], pila[0][3]]
+                        errores.append(aux) 
+                        listadoRegistros.append(registrar)
+                        registrar = []       
+                        pila.pop(0)
+                    else:
+                        validarLERegistroP()                        
+                        aux = [pila[0][0], 'Error inesperado', 'Sintáctico', pila[0][2], pila[0][3]]
+                        errores.append(aux)        
+                        pila.pop(0)
+                        validarLERegistroP()
+            else:
+                pila.pop(0)
+                listadoRegistros.append(registrar)
+                #global reg 
+                registrar = []
+                validarRegistro()
