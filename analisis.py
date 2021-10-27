@@ -10,6 +10,8 @@ pila = []#Pila para manejar los tokens en el parser.
 listadoClaves = []  #Guarda las claves al reconocerlas en el parser.
 listadoRegistros = [] #Guarda los registros al reconocerlas en el parser.
 registrar = [] #Lista que almacena temporalmente un conjunto de registor {}
+listadoReporteria = []#Almacena el listado de reportes a realizar.(reporte = comando del lenguaje del programa).
+auxReporteria = []#Auxiliar para almacenar el reporte(reporte =  comandodel lenguaje del programa).
 
 #Convierte a ascii y verifica si corresponde a algún caracter.
 def isLetra(c):
@@ -59,9 +61,22 @@ def automata(doc):
     global listado
     global tokens
     global errores
+    global pila
+    global listadoClaves
+    global listadoRegistros
+    global registrar
+    global listadoReporteria
+    global auxReporteria
+    #Limpiando las listas pra un nuevo scanneo
     listado = []
     tokens = []
     errores = []
+    pila = []
+    listadoClaves = []
+    listadoRegistros = []
+    registrar = []
+    listadoReporteria = []
+    auxReporteria = []
 
     datos = doc + '~'
     estado = 0
@@ -570,7 +585,8 @@ def tokenizar():
                         aux = [elemento[0], 'Caracteres Inesperados', 'Léxico', elemento[1], elemento[2]]
                         errores.append(aux)                        
                 break 
-    parser()
+    if len(errores) == 0:
+        parser()
     #print(tokens)
     #print('############################')
     #print(errores)
@@ -587,12 +603,15 @@ def parser():
     acep = ['~', 'Aceptacion', 'x', 'y']
     pila.append(acep)
     validarCLAVES()
-    validarREGISTROS()
-    #print(listadoRegistros)
+    if pila[0][0] != '~' and pila[0][1] != 'Aceptacion':
+        validarREGISTROS()
+    if pila[0][0] != '~' and pila[0][1] != 'Aceptacion':
+        validarREPORTES()
     print(errores)
     print("----------------------------------------------------------")
     print(listadoRegistros)
 
+#Funciones pertenecientes al parser.
 def validarCLAVES():
  
     if pila[0][1] == 'Palabra Reservada':
@@ -718,6 +737,7 @@ def validarTkCadena():
         #errores.append(aux)        
         #pila.pop(0)
         return False
+
 
 def validarREGISTROS():
     if len(pila) > 0:
@@ -889,3 +909,189 @@ def validarLERegistroP():
                     listadoRegistros.append(registrar)
                 registrar = []
                 validarRegistro()
+
+def validarParentesis(simbolo, modo):
+    if modo == 'a':
+        if simbolo == '(':
+            return True
+        else:
+            return False
+    elif modo == 'c':
+        if simbolo == ')':
+            return True
+        else:
+            return False
+
+#Vacia la pila de tokens hasta encontrar un token 'Palabra Reservada'
+def popPila():
+    global auxReporteria
+    var1 = False
+    var2 = False
+    for token in pila:
+       
+        if pila[0][0] == '~' and pila[0][1] == 'Aceptacion':
+            aux = [pila[0][0], 'Error inesperado', 'Sintáctico', pila[0][2], pila[0][3]]
+            errores.append(aux)        
+            auxReporteria = []
+            var1 = True
+            break
+        elif pila[0][0] != '~' and token[1] != 'Aceptacion' and pila[0][1] != 'Palabra Reservada':
+            pila.pop(0)
+        elif pila[0][1] == 'Palabra Reservada':
+            var2 = True
+            break
+    if var1 == True:
+        pass
+    elif var2 == True:
+        validarReporte()
+
+def validarREPORTES():
+    validarReporte()
+
+def validarReporte():
+    if pila[0][0] == 'imprimir':
+        auxReporteria.append('01')
+        pila.pop(0)
+        validarIMPRESION()
+        
+    elif pila[0][0] == 'imprimirln':
+        auxReporteria.append('02')
+        pila.pop(0)
+        validarIMPRESIONLN()
+    elif pila[0][0] == 'conteo':
+        auxReporteria.append('03')
+        pila.pop(0)
+        validarCONTEO()
+    elif pila[0][0] == 'promedio':
+        pass
+    elif pila[0][0] == 'contarsi':
+        pass
+    elif pila[0][0] == 'datos':
+        pass
+    elif pila[0][0] == 'sumar': 
+        pass
+    elif pila[0][0] == 'max':
+        pass
+    elif pila[0][0] == 'min':
+        pass
+    elif pila[0][0] == 'exportarReporte':
+        pass
+    else:
+        if pila[0][0] != '~' and pila[0][1] != 'Aceptacion': 
+            aux = [pila[0][0], 'Error inesperado', 'Sintáctico', pila[0][2], pila[0][3]]
+            errores.append(aux)        
+            pila.pop(0)
+            validarReporte()
+
+def validarIMPRESION():
+    global auxReporteria
+    global listadoReporteria
+    res = validarParentesis(pila[0][0], 'a')
+    if res == True:
+        pila.pop(0)#Elimina el parentesis de la apertura.
+        if pila[0][1] == "Cadena":
+            auxReporteria.append(darFormato(pila[0][0], pila[0][1]))
+            pila.pop(0)
+            res2 = validarParentesis(pila[0][0], 'c')
+            if res2 == True:
+                pila.pop(0)#Elimina el parentesis de cierre.
+                if pila[0][0] == ';':
+                    pila.pop(0)
+                    listadoReporteria.append(auxReporteria)
+                    auxReporteria = []
+                    validarReporte()
+                else:
+                    aux = [pila[0][0], 'Se esperaba el símbolo ;', 'Sintáctico', pila[0][2], pila[0][3]]
+                    errores.append(aux) 
+                    auxReporteria = []
+                    popPila()
+            else:
+                aux = [pila[0][0], 'Se esperaba el símbolo )', 'Sintáctico', pila[0][2], pila[0][3]]
+                errores.append(aux) 
+                auxReporteria = []
+                popPila()
+        else:
+            aux = [pila[0][0], 'Se esperaba el token Cadena', 'Sintáctico', pila[0][2], pila[0][3]]
+            errores.append(aux) 
+            auxReporteria = []
+            popPila()
+    else:
+        aux = [pila[0][0], 'Se esperaba el símbolo (', 'Sintáctico', pila[0][2], pila[0][3]]
+        errores.append(aux) 
+        auxReporteria = []
+        popPila()
+
+def validarIMPRESIONLN():
+    global auxReporteria
+    global listadoReporteria
+    res = validarParentesis(pila[0][0], 'a')
+    if res == True:
+        pila.pop(0)#Elimina el parentesis de la apertura.
+        if pila[0][1] == "Cadena":
+            auxReporteria.append(darFormato(pila[0][0], pila[0][1]))
+            pila.pop(0)
+            res2 = validarParentesis(pila[0][0], 'c')
+            if res2 == True:
+                pila.pop(0)#Elimina el parentesis de cierre.
+                if pila[0][0] == ';':
+                    pila.pop(0)
+                    listadoReporteria.append(auxReporteria)
+                    auxReporteria = []
+                    validarReporte()
+                else:
+                    aux = [pila[0][0], 'Se esperaba el símbolo ;', 'Sintáctico', pila[0][2], pila[0][3]]
+                    errores.append(aux) 
+                    auxReporteria = []
+                    popPila()
+            else:
+                aux = [pila[0][0], 'Se esperaba el símbolo )', 'Sintáctico', pila[0][2], pila[0][3]]
+                errores.append(aux) 
+                auxReporteria = []
+                popPila()
+        else:
+            aux = [pila[0][0], 'Se esperaba una Cadena', 'Sintáctico', pila[0][2], pila[0][3]]
+            errores.append(aux) 
+            auxReporteria = []
+            popPila()
+    else:
+        aux = [pila[0][0], 'Se esperaba el símbolo (', 'Sintáctico', pila[0][2], pila[0][3]]
+        errores.append(aux) 
+        auxReporteria = []
+        popPila()
+
+def validarCONTEO():
+    global auxReporteria
+    global listadoReporteria
+    res = validarParentesis(pila[0][0], 'a')
+    if res == True:
+        pila.pop(0)
+        res2 = validarParentesis(pila[0][0], 'c')
+        if res2 == True:
+            pila.pop(0)
+            if pila[0][0] == ';':
+                pila.pop(0)
+                numRegColumnas = len(listadoRegistros[0])#La cantidad de registros que tiene una fila
+                numRegFilas = len(listadoRegistros)#La cantidad de filas que hay
+                total = numRegColumnas * numRegFilas
+                auxReporteria.append(str(total))
+                listadoReporteria.append(auxReporteria)
+                auxReporteria = []
+                validarReporte()
+            else:
+                aux = [pila[0][0], 'Se esperaba el símbolo ;', 'Sintáctico', pila[0][2], pila[0][3]]
+                errores.append(aux) 
+                auxReporteria = []
+                popPila()
+        else:
+            aux = [pila[0][0], 'Se esperaba el símbolo )', 'Sintáctico', pila[0][2], pila[0][3]]
+            errores.append(aux) 
+            auxReporteria = []
+            popPila()
+    else:
+        aux = [pila[0][0], 'Se esperaba el símbolo (', 'Sintáctico', pila[0][2], pila[0][3]]
+        errores.append(aux) 
+        auxReporteria = []
+        popPila()
+
+def getReporteria():
+    return listadoReporteria

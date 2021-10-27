@@ -2,9 +2,10 @@ from tkinter import *
 from tkinter import filedialog, messagebox
 from os import system, startfile
 
-from analisis import automata, generarReporteTokens, generarReporteErrores
+from analisis import automata, getReporteria, generarReporteTokens, generarReporteErrores
 doc ='' #Variable que almacena 
-editor = '' #El área de edición de la ventana principal
+editor = '' #El área de edición de la ventana principal.
+consola = '' #Consola del programa.
 existenTokens = False
 existenErrores = False
 
@@ -48,12 +49,32 @@ def getCodigo():
             existenTokens = True
             existenErrores = False
             messagebox.showinfo(message='Análisis exitoso', title='Analizar Archivo')
+            mostrarEnConsola()
         else:
             existenTokens = True
             existenErrores = True
             messagebox.showwarning(message='Se encontraron algunos errores, corrige el archivo de entrada.', title='Analizar Archivo')
+            #mostrarEnConsola()
     else:
         messagebox.showwarning(message='No hay datos para analizar', title='Analizar Archivo')
+
+def mostrarEnConsola():
+    global consola
+    consola.delete(1.0, END)
+    consola.config(state='normal')
+
+    lista = getReporteria()
+    for elemento in lista:
+        if elemento[0] == '01':
+            consola.insert(END, str(elemento[1]))
+        elif elemento[0] == '02':
+            consola.insert(END, str(elemento[1]))
+            consola.insert(END,'\n')
+        elif elemento[0] == '03':
+            consola.insert(END, str(elemento[1]))
+    consola.config(state="disabled")
+    
+
 
 def getReporteTokens():
     global existenTokens
@@ -131,7 +152,7 @@ if __name__ == '__main__':
     frame = Frame(app)
     frame.config(bg='#333A3B', padx=25)
     frame.pack(fill='both', expand = True)
-    frame.pack_propagate(False)
+    frame.pack_propagate(False)#Para que no se adapte al tamaño de los hijos.
 
     #Frames Contenedores
     frame1 = Frame(frame, width=460, height=550)
@@ -154,8 +175,10 @@ if __name__ == '__main__':
     seccion2 = Label(frame2, text='CONSOLA')
     seccion2.pack()
     consola = Text(frame2, width=50, height=30)
-    consola.insert(1.0, 'Hola Mundo, esta es la consola del programa.')
+    #consola.insert(1.0, 'Hola Mundo, esta es la consola del programa.')
     consola.config(state='disabled', padx=10, pady=10, bd=0, bg='#000000', fg ='#08AEF5', selectbackground="#333A3B", font=("Consolas", 12))
+    #consola.config(padx=10, pady=10, bd=0, bg='#000000', fg ='#08AEF5', selectbackground="#333A3B", font=("Consolas", 12))
+    consola.pack_propagate(False)
     consola.pack()
 
     app.mainloop()
