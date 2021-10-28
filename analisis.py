@@ -963,11 +963,17 @@ def validarReporte():
         pila.pop(0)
         validarCONTEO()
     elif pila[0][0] == 'promedio':
-        pass
+        auxReporteria.append('04')
+        pila.pop(0)
+        validarPROMEDIO()
     elif pila[0][0] == 'contarsi':
-        pass
+        auxReporteria.append('05')
+        pila.pop(0)
+        validarCONTARSI()
     elif pila[0][0] == 'datos':
-        pass
+        auxReporteria.append('06')
+        pila.pop(0)
+        validarDATOS()
     elif pila[0][0] == 'sumar': 
         pass
     elif pila[0][0] == 'max':
@@ -1093,5 +1099,240 @@ def validarCONTEO():
         auxReporteria = []
         popPila()
 
+def validarPROMEDIO():
+    global auxReporteria
+    global listadoReporteria
+    campo = ''
+    res = validarParentesis(pila[0][0], 'a')
+    if res == True:
+        pila.pop(0)#Elimina el parentesis de la apertura.
+        if pila[0][1] == "Cadena":
+            #auxReporteria.append(darFormato(pila[0][0], pila[0][1]))
+            campo = pila[0][0]
+            pila.pop(0)
+            res2 = validarParentesis(pila[0][0], 'c')
+            if res2 == True:
+                pila.pop(0)#Elimina el parentesis de cierre.
+                if pila[0][0] == ';':
+                    pila.pop(0)
+                    res3 = buscarClave(darFormato(campo, 'Cadena'))#Obtiene la clave a la que se le va a sacar promedio.
+                    if res3[0] == True:
+                        res4 = calcularPromedio(res3[1])
+                        if res4 != None:
+                            auxReporteria.append(res4)
+                            listadoReporteria.append(auxReporteria)
+                            auxReporteria = []
+                            validarReporte()
+                        else:
+                            #Si entra aquí encontro un valor tipo string(no se puede calcular el promedio)
+                            aux = [pila[0][0], 'Se esperaba un valor númerico.', 'Sintáctico', pila[0][2], pila[0][3]]
+                            errores.append(aux) 
+                            auxReporteria = []
+                            popPila()
+                    else:
+                        aux = [str(campo), 'No se encontro el campo indicado.', 'Ejecución', pila[0][2], pila[0][3]]
+                        errores.append(aux) 
+                        auxReporteria = []
+                        popPila()
+                else:
+                    aux = [pila[0][0], 'Se esperaba el símbolo ;', 'Sintáctico', pila[0][2], pila[0][3]]
+                    errores.append(aux) 
+                    auxReporteria = []
+                    popPila()
+            else:
+                aux = [pila[0][0], 'Se esperaba el símbolo )', 'Sintáctico', pila[0][2], pila[0][3]]
+                errores.append(aux) 
+                auxReporteria = []
+                popPila()
+        else:
+            aux = [pila[0][0], 'Se esperaba el token Cadena', 'Sintáctico', pila[0][2], pila[0][3]]
+            errores.append(aux) 
+            auxReporteria = []
+            popPila()
+    else:
+        aux = [pila[0][0], 'Se esperaba el símbolo (', 'Sintáctico', pila[0][2], pila[0][3]]
+        errores.append(aux) 
+        auxReporteria = []
+        popPila()
+
+def validarCONTARSI():
+    global auxReporteria
+    global listadoReporteria
+    campo = ''
+    res = validarParentesis(pila[0][0], 'a')
+    if res == True:
+        pila.pop(0)#Elimina el parentesis de la apertura.
+        if pila[0][1] == "Cadena":
+            campo = darFormato(pila[0][0], 'Cadena')
+            res2 = buscarClave(campo)
+            if res2[0] == True:
+                pila.pop(0)
+                if pila[0][0] == ',':
+                    pila.pop(0)
+                    if pila[0][1] == 'Cadena':
+                        valor = darFormato(pila[0][0], 'Cadena')
+                        pila.pop(0)                
+                        res3 = validarParentesis(pila[0][0], 'c')
+                        if res3 == True:
+                            pila.pop(0)
+                            if pila[0][0] == ';':
+                                pila.pop(0)
+                                res4 = calcularContarsi(res2[1], valor)
+                                auxReporteria.append(res4)
+                                listadoReporteria.append(auxReporteria)
+                                auxReporteria = []
+                                validarReporte()
+                            else:
+                                aux = [pila[0][0], 'Se esperaba el símbolo ;', 'Sintáctico', pila[0][2], pila[0][3]]
+                                errores.append(aux) 
+                                auxReporteria = []
+                                popPila()  
+                        else:
+                            aux = [pila[0][0], 'Se esperaba el símbolo )', 'Sintáctico', pila[0][2], pila[0][3]]
+                            errores.append(aux) 
+                            auxReporteria = []
+                            popPila()                              
+                    elif pila[0][1] == 'Número Entero':
+                        valor = darFormato(pila[0][0], 'Número Entero')
+                        pila.pop(0)                
+                        res3 = validarParentesis(pila[0][0], 'c')
+                        if res3 == True:
+                            pila.pop(0)
+                            if pila[0][0] == ';':
+                                pila.pop(0)
+                                res4 = calcularContarsi(res2[1], valor)
+                                auxReporteria.append(res4)
+                                listadoReporteria.append(auxReporteria)
+                                auxReporteria = []
+                                validarReporte()
+                            else:
+                                aux = [pila[0][0], 'Se esperaba el símbolo ;', 'Sintáctico', pila[0][2], pila[0][3]]
+                                errores.append(aux) 
+                                auxReporteria = []
+                                popPila()  
+                        else:
+                            aux = [pila[0][0], 'Se esperaba el símbolo )', 'Sintáctico', pila[0][2], pila[0][3]]
+                            errores.append(aux) 
+                            auxReporteria = []
+                            popPila()                      
+                    elif pila[0][1] == 'Número Decimal':
+                        valor = darFormato(pila[0][0], 'Número Decimal')
+                        pila.pop(0)                
+                        res3 = validarParentesis(pila[0][0], 'c')
+                        if res3 == True:
+                            pila.pop(0)
+                            if pila[0][0] == ';':
+                                pila.pop(0)
+                                res4 = calcularContarsi(res2[1], valor)
+                                auxReporteria.append(res4)
+                                listadoReporteria.append(auxReporteria)
+                                auxReporteria = []
+                                validarReporte()
+                            else:
+                                aux = [pila[0][0], 'Se esperaba el símbolo ;', 'Sintáctico', pila[0][2], pila[0][3]]
+                                errores.append(aux) 
+                                auxReporteria = []
+                                popPila()  
+                        else:
+                            aux = [pila[0][0], 'Se esperaba el símbolo )', 'Sintáctico', pila[0][2], pila[0][3]]
+                            errores.append(aux) 
+                            auxReporteria = []
+                            popPila()  
+                    else:
+                        aux = [pila[0][0], 'Se esperaba una cadena o un valor númerico.', 'Sintáctico', pila[0][2], pila[0][3]]
+                        errores.append(aux) 
+                        auxReporteria = []
+                        popPila()                    
+                else:
+                    aux = [pila[0][0], 'Se esperaba el símbolo ,', 'Sintáctico', pila[0][2], pila[0][3]]
+                    errores.append(aux) 
+                    auxReporteria = []
+                    popPila()
+            else:
+                aux = [str(campo), 'No se encontro el campo indicado.', 'Ejecución', pila[0][2], pila[0][3]]
+                errores.append(aux) 
+                auxReporteria = []
+                popPila()                
+        else:
+            aux = [pila[0][0], 'Se esperaba el token Cadena', 'Sintáctico', pila[0][2], pila[0][3]]
+            errores.append(aux) 
+            auxReporteria = []
+            popPila()
+    else:
+        aux = [pila[0][0], 'Se esperaba el símbolo (', 'Sintáctico', pila[0][2], pila[0][3]]
+        errores.append(aux) 
+        auxReporteria = []
+        popPila()
+
+def validarDATOS():
+    global auxReporteria
+    global listadoReporteria
+    res = validarParentesis(pila[0][0], 'a')
+    if res == True:
+        pila.pop(0)
+        res2 = validarParentesis(pila[0][0], 'c')
+        if res2 == True:
+            pila.pop(0)
+            if pila[0][0] == ';':
+                pila.pop(0)
+                listadoReporteria.append(auxReporteria)
+                auxReporteria = []
+                validarReporte()
+            else:
+                aux = [pila[0][0], 'Se esperaba el símbolo ;', 'Sintáctico', pila[0][2], pila[0][3]]
+                errores.append(aux) 
+                auxReporteria = []
+                popPila()
+        else:
+            aux = [pila[0][0], 'Se esperaba el símbolo )', 'Sintáctico', pila[0][2], pila[0][3]]
+            errores.append(aux) 
+            auxReporteria = []
+            popPila()
+    else:
+        aux = [pila[0][0], 'Se esperaba el símbolo (', 'Sintáctico', pila[0][2], pila[0][3]]
+        errores.append(aux) 
+        auxReporteria = []
+        popPila()
+
+
+def buscarClave(campo):
+    for i in range(len(listadoClaves)):
+        if campo == listadoClaves[i]:
+            respuesta = [True, int(i)]
+            return respuesta
+    respuesta = [False]
+    return respuesta   
+
+def calcularPromedio(posicion):
+    sumatoria = 0
+    total = len(listadoRegistros)
+    promedio = 0
+    error = False
+    for i in range(len(listadoRegistros)):
+        if type(listadoRegistros[i][posicion]) is int:
+            sumatoria += listadoRegistros[i][posicion]
+        elif type(listadoRegistros[i][posicion]) is float:
+            sumatoria += listadoRegistros[i][posicion]
+        elif type(listadoRegistros[i][posicion]) is str:
+            error = True
+            break
+    if error == False:
+        promedio = sumatoria /  total
+    else:
+        promedio = None
+    return promedio
+
+def calcularContarsi(posicion, valor):
+    cantidad = 0
+    for i in range(len(listadoRegistros)):
+        if listadoRegistros[i][posicion] == valor:
+            cantidad += 1
+    return cantidad   
+
+
+#Devuelve la listad de comandos a ejecutar
 def getReporteria():
     return listadoReporteria
+
+def getListados():
+    return listadoClaves, listadoRegistros

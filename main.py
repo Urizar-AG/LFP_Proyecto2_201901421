@@ -1,8 +1,8 @@
 from tkinter import *
 from tkinter import filedialog, messagebox
 from os import system, startfile
-
-from analisis import automata, getReporteria, generarReporteTokens, generarReporteErrores
+from tabulate import tabulate
+from analisis import automata, getReporteria, getListados, generarReporteTokens, generarReporteErrores
 doc ='' #Variable que almacena 
 editor = '' #El área de edición de la ventana principal.
 consola = '' #Consola del programa.
@@ -42,6 +42,10 @@ def getCodigo():
     global editor
     global existenTokens
     global existenErrores
+    global consola
+    consola.config(state='normal')
+
+    consola.delete(1.0, END)
     doc = editor.get(1.0, END)
     if len(doc)>0 and doc != '' and doc != '\n' and doc != '\t' and doc is not None:
         resultado = automata(doc)
@@ -60,8 +64,9 @@ def getCodigo():
 
 def mostrarEnConsola():
     global consola
-    consola.delete(1.0, END)
     consola.config(state='normal')
+
+    consola.delete(1.0, END)
 
     lista = getReporteria()
     for elemento in lista:
@@ -72,6 +77,16 @@ def mostrarEnConsola():
             consola.insert(END,'\n')
         elif elemento[0] == '03':
             consola.insert(END, str(elemento[1]))
+        elif elemento[0] == '04':
+            consola.insert(END, str(elemento[1]))
+        elif elemento[0] == '05':
+            consola.insert(END, str(elemento[1]))
+        elif elemento[0] == '06':
+            lista1, lista2 = getListados()
+            consola.insert(END,'\n')
+            consola.insert(END,tabulate(lista2, headers = lista1))
+            consola.insert(END,'\n')
+
     consola.config(state="disabled")
     
 
@@ -175,7 +190,6 @@ if __name__ == '__main__':
     seccion2 = Label(frame2, text='CONSOLA')
     seccion2.pack()
     consola = Text(frame2, width=50, height=30)
-    #consola.insert(1.0, 'Hola Mundo, esta es la consola del programa.')
     consola.config(state='disabled', padx=10, pady=10, bd=0, bg='#000000', fg ='#08AEF5', selectbackground="#333A3B", font=("Consolas", 12))
     #consola.config(padx=10, pady=10, bd=0, bg='#000000', fg ='#08AEF5', selectbackground="#333A3B", font=("Consolas", 12))
     consola.pack_propagate(False)
