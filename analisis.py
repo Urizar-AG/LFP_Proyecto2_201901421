@@ -1,4 +1,4 @@
-from reportes import reporteT, reporteE
+from reportes import reporteT, reporteE, reporteEX
 
 reservadas = ['Claves', 'Registros', 'imprimir', 'imprimirln', 'conteo', 'promedio',
               'contarsi', 'datos', 'sumar', 'max', 'min', 'exportarReporte']
@@ -997,7 +997,9 @@ def validarReporte():
         pila.pop(0)
         validarMIN()
     elif pila[0][0] == 'exportarReporte':
-        pass
+        auxReporteria.append('10')
+        pila.pop(0)
+        validarEXPORTARREPORTE()
     else:
         if pila[0][0] != '~' and pila[0][1] != 'Aceptacion': 
             aux = [pila[0][0], 'Error inesperado', 'Sintáctico', pila[0][2], pila[0][3]]
@@ -1438,7 +1440,7 @@ def validarMIN():
                 pila.pop(0)#Elimina el parentesis de cierre.
                 if pila[0][0] == ';':
                     pila.pop(0)
-                    res3 = buscarClave(darFormato(campo, 'Cadena'))#Obtiene la clave donde se va a buscar el máximo
+                    res3 = buscarClave(darFormato(campo, 'Cadena'))#Obtiene la clave donde se va a buscar el mínimo
                     if res3[0] == True:
                         res4 = obtenerMax_Min(res3[1], 'min')
                         if res4 != None:
@@ -1447,7 +1449,7 @@ def validarMIN():
                             auxReporteria = []
                             validarReporte()
                         else:
-                            #Si entra aquí encontro un valor tipo string(no se puede encontrar el máximo).
+                            #Si entra aquí encontro un valor tipo string(no se puede encontrar el mínimo).
                             aux = [pila[0][0], 'Se esperaba un valor númerico.', 'Sintáctico', pila[0][2], pila[0][3]]
                             errores.append(aux) 
                             auxReporteria = []
@@ -1477,6 +1479,50 @@ def validarMIN():
         errores.append(aux) 
         auxReporteria = []
         popPila()
+
+def validarEXPORTARREPORTE(): 
+    global auxReporteria
+    global listadoReporteria
+    campo = ''
+    res = validarParentesis(pila[0][0], 'a')
+    if res == True:
+        pila.pop(0)#Elimina el parentesis de la apertura.
+        if pila[0][1] == "Cadena":
+            #auxReporteria.append(darFormato(pila[0][0], pila[0][1]))
+            titulo = pila[0][0]
+            pila.pop(0)
+            res2 = validarParentesis(pila[0][0], 'c')
+            if res2 == True:
+                pila.pop(0)#Elimina el parentesis de cierre.
+                if pila[0][0] == ';':
+                    pila.pop(0)
+                    auxReporteria.append('Exportar datos a HTML: Satisfactorio.')
+                    listadoReporteria.append(auxReporteria)
+                    auxReporteria = []
+                    exportarReporte(darFormato(titulo, 'Cadena'), listadoClaves, listadoRegistros)
+                    validarReporte()                    
+                    #exportarReporte(titulo, listadoClaves, listadoRegistros)
+                else:
+                    aux = [pila[0][0], 'Se esperaba el símbolo ;', 'Sintáctico', pila[0][2], pila[0][3]]
+                    errores.append(aux) 
+                    auxReporteria = []
+                    popPila()
+            else:
+                aux = [pila[0][0], 'Se esperaba el símbolo )', 'Sintáctico', pila[0][2], pila[0][3]]
+                errores.append(aux) 
+                auxReporteria = []
+                popPila()
+        else:
+            aux = [pila[0][0], 'Se esperaba el token Cadena', 'Sintáctico', pila[0][2], pila[0][3]]
+            errores.append(aux) 
+            auxReporteria = []
+            popPila()
+    else:
+        aux = [pila[0][0], 'Se esperaba el símbolo (', 'Sintáctico', pila[0][2], pila[0][3]]
+        errores.append(aux) 
+        auxReporteria = []
+        popPila()
+
 
 
 def buscarClave(campo):
@@ -1570,3 +1616,6 @@ def obtenerMax_Min(posicion, modo):
             return listado[0] #Devuelve la primera posición
         else:
             return None        
+
+def exportarReporte(titulo, listaUno, listaDos):
+    reporteEX(titulo, listaUno, listaDos);            

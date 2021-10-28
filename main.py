@@ -96,11 +96,13 @@ def mostrarEnConsola():
             consola.insert(END,'\n')  
         elif elemento[0] == '09':
             consola.insert(END, str(elemento[1]))
-            consola.insert(END,'\n')          
+            consola.insert(END,'\n')
+        elif elemento[0] == '10':
+            consola.insert(END, str(elemento[1]))
+            consola.insert(END, '\n')
+            startfile('Reportes\\ReporteDatos.html')         
 
     consola.config(state="disabled")#Se deshabilita la escritura de la consola y queda como solo lectura.
-
-
 
 def getReporteTokens():
     global existenTokens
