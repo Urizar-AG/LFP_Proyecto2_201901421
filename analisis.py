@@ -617,9 +617,7 @@ def parser():
         validarREGISTROS()
     if pila[0][0] != '~' and pila[0][1] != 'Aceptacion':
         validarREPORTES()
-    print(errores)
-    print("----------------------------------------------------------")
-    print(listadoRegistros)
+
 
 #Funciones pertenecientes al parser.
 def validarCLAVES():
@@ -1592,7 +1590,7 @@ def obtenerMax_Min(posicion, modo):
                         tmp = listado[j]
                         listado[j] = listado[j+1]
                         listado[j+1] = tmp
-            print(listado)
+
             return listado[-1] #Devuelve la última posición
         else:
             return None
@@ -1612,10 +1610,11 @@ def obtenerMax_Min(posicion, modo):
                         tmp = listado[j]
                         listado[j] = listado[j+1]
                         listado[j+1] = tmp
-            print(listado)
+            
             return listado[0] #Devuelve la primera posición
         else:
             return None        
 
 def exportarReporte(titulo, listaUno, listaDos):
-    reporteEX(titulo, listaUno, listaDos);            
+    reporteEX(titulo, listaUno, listaDos);
+                

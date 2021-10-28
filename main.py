@@ -46,6 +46,7 @@ def getCodigo():
 
     consola.config(state='normal')
     consola.delete(1.0, END)
+    consola.config(state='disabled')
     doc = editor.get(1.0, END)
     if len(doc)>0 and doc != '' and doc != '\n' and doc != '\t' and doc is not None:
         resultado = automata(doc)
@@ -204,21 +205,29 @@ if __name__ == '__main__':
     frame2.pack(side = RIGHT)
 
     #Área de edición
+    scrollE=Scrollbar(frame1, orient='horizontal')#Scrollbar(scroll horizontal) para la consola.
+    scrollE.pack(side=BOTTOM, fill='x')
+
     seccion1 = Label(frame1, text='EDITOR')
     seccion1.pack()
-    #global editor
-    editor = Text(frame1, width=50, height=30)
+    editor = Text(frame1, wrap=NONE, height=30, xscrollcommand=scrollE.set)
+    #editor = Text(frame1, width=50, height=30)
     editor.config(padx=10, pady=10, bd=0, bg='#000000', fg='#FFFFFF', selectbackground="#333A3B", insertbackground="#FFFFFF", font=("Consolas", 12))
     editor.pack_propagate(False)
     editor.pack()
+    scrollE.config(command=editor.xview)
 
     #Consola
+    scrollC=Scrollbar(frame2, orient='horizontal')#Scrollbar(scroll horizontal) para la consola.
+    scrollC.pack(side=BOTTOM, fill='x')
+
     seccion2 = Label(frame2, text='CONSOLA')
     seccion2.pack()
-    consola = Text(frame2, width=50, height=30)
+    consola = Text(frame2, wrap=NONE, height=30, xscrollcommand=scrollC.set)
+    #consola = Text(frame2, width=50, height=30)
     consola.config(state='disabled', padx=10, pady=10, bd=0, bg='#000000', fg ='#08AEF5', selectbackground="#333A3B", font=("Consolas", 12))
-    #consola.config(padx=10, pady=10, bd=0, bg='#000000', fg ='#08AEF5', selectbackground="#333A3B", font=("Consolas", 12))
     consola.pack_propagate(False)
     consola.pack()
+    scrollC.config(command=consola.xview)
 
     app.mainloop()
