@@ -13,6 +13,22 @@ registrar = [] #Lista que almacena temporalmente un conjunto de registor {}
 listadoReporteria = []#Almacena el listado de reportes a realizar.(reporte = comando del lenguaje del programa).
 auxReporteria = []#Auxiliar para almacenar el reporte(reporte =  comandodel lenguaje del programa).
 
+#----------------------------------------------------------------------------------------------------------------------------------------
+def getListados():
+    return listadoClaves, listadoRegistros
+
+#Devuelve la listad de comandos a ejecutar
+def getReporteria():
+    return listadoReporteria
+
+def generarReporteTokens():
+    reporteT(tokens)
+
+def generarReporteErrores():
+    reporteE(errores)
+
+#---------------------------------------------------------- Análisis léxico y sintáctico ------------------------------------------------
+
 #Convierte a ascii y verifica si corresponde a algún caracter.
 def isLetra(c):
     if ((ord(c)>=65 and ord(c)<=90) or (ord(c)>=97 and ord(c)<=122)
@@ -418,7 +434,7 @@ def automata(doc):
     else:
         return False
 
-#Identifica los token y busca errores
+#Identifica los token y busca errores léxicos.
 def tokenizar():
     for elemento in listado:
         #Reservada correcta
@@ -590,12 +606,6 @@ def tokenizar():
     #print(tokens)
     #print('############################')
     #print(errores)
-
-def generarReporteTokens():
-    reporteT(tokens)
-
-def generarReporteErrores():
-    reporteE(errores)
 
 def parser():
     for elemento in tokens:
@@ -945,6 +955,7 @@ def popPila():
     elif var2 == True:
         validarReporte()
 
+
 def validarREPORTES():
     validarReporte()
 
@@ -953,7 +964,6 @@ def validarReporte():
         auxReporteria.append('01')
         pila.pop(0)
         validarIMPRESION()
-        
     elif pila[0][0] == 'imprimirln':
         auxReporteria.append('02')
         pila.pop(0)
@@ -975,11 +985,17 @@ def validarReporte():
         pila.pop(0)
         validarDATOS()
     elif pila[0][0] == 'sumar': 
-        pass
+        auxReporteria.append('07')
+        pila.pop(0)
+        validarSUMAR()
     elif pila[0][0] == 'max':
-        pass
+        auxReporteria.append('08')
+        pila.pop(0)
+        validarMAX()
     elif pila[0][0] == 'min':
-        pass
+        auxReporteria.append('09')
+        pila.pop(0)
+        validarMIN()
     elif pila[0][0] == 'exportarReporte':
         pass
     else:
@@ -1294,6 +1310,174 @@ def validarDATOS():
         auxReporteria = []
         popPila()
 
+def validarSUMAR():
+    global auxReporteria
+    global listadoReporteria
+    campo = ''
+    res = validarParentesis(pila[0][0], 'a')
+    if res == True:
+        pila.pop(0)#Elimina el parentesis de la apertura.
+        if pila[0][1] == "Cadena":
+            #auxReporteria.append(darFormato(pila[0][0], pila[0][1]))
+            campo = pila[0][0]
+            pila.pop(0)
+            res2 = validarParentesis(pila[0][0], 'c')
+            if res2 == True:
+                pila.pop(0)#Elimina el parentesis de cierre.
+                if pila[0][0] == ';':
+                    pila.pop(0)
+                    res3 = buscarClave(darFormato(campo, 'Cadena'))#Obtiene la clave a la que se le va a ser la suma.
+                    if res3[0] == True:
+                        res4 = calcularSuma(res3[1])
+                        if res4 != None:
+                            auxReporteria.append(res4)
+                            listadoReporteria.append(auxReporteria)
+                            auxReporteria = []
+                            validarReporte()
+                        else:
+                            #Si entra aquí encontro un valor tipo string(no se puede calcular la suma).
+                            aux = [pila[0][0], 'Se esperaba un valor númerico.', 'Sintáctico', pila[0][2], pila[0][3]]
+                            errores.append(aux) 
+                            auxReporteria = []
+                            popPila()
+                    else:
+                        aux = [str(campo), 'No se encontro el campo indicado.', 'Ejecución', pila[0][2], pila[0][3]]
+                        errores.append(aux) 
+                        auxReporteria = []
+                        popPila()
+                else:
+                    aux = [pila[0][0], 'Se esperaba el símbolo ;', 'Sintáctico', pila[0][2], pila[0][3]]
+                    errores.append(aux) 
+                    auxReporteria = []
+                    popPila()
+            else:
+                aux = [pila[0][0], 'Se esperaba el símbolo )', 'Sintáctico', pila[0][2], pila[0][3]]
+                errores.append(aux) 
+                auxReporteria = []
+                popPila()
+        else:
+            aux = [pila[0][0], 'Se esperaba el token Cadena', 'Sintáctico', pila[0][2], pila[0][3]]
+            errores.append(aux) 
+            auxReporteria = []
+            popPila()
+    else:
+        aux = [pila[0][0], 'Se esperaba el símbolo (', 'Sintáctico', pila[0][2], pila[0][3]]
+        errores.append(aux) 
+        auxReporteria = []
+        popPila()
+
+def validarMAX():
+    global auxReporteria
+    global listadoReporteria
+    campo = ''
+    res = validarParentesis(pila[0][0], 'a')
+    if res == True:
+        pila.pop(0)#Elimina el parentesis de la apertura.
+        if pila[0][1] == "Cadena":
+            #auxReporteria.append(darFormato(pila[0][0], pila[0][1]))
+            campo = pila[0][0]
+            pila.pop(0)
+            res2 = validarParentesis(pila[0][0], 'c')
+            if res2 == True:
+                pila.pop(0)#Elimina el parentesis de cierre.
+                if pila[0][0] == ';':
+                    pila.pop(0)
+                    res3 = buscarClave(darFormato(campo, 'Cadena'))#Obtiene la clave donde se va a buscar el máximo
+                    if res3[0] == True:
+                        res4 = obtenerMax_Min(res3[1], 'max')
+                        if res4 != None:
+                            auxReporteria.append(str(res4))
+                            listadoReporteria.append(auxReporteria)
+                            auxReporteria = []
+                            validarReporte()
+                        else:
+                            #Si entra aquí encontro un valor tipo string(no se puede encontrar el máximo).
+                            aux = [pila[0][0], 'Se esperaba un valor númerico.', 'Sintáctico', pila[0][2], pila[0][3]]
+                            errores.append(aux) 
+                            auxReporteria = []
+                            popPila()
+                    else:
+                        aux = [str(campo), 'No se encontro el campo indicado.', 'Ejecución', pila[0][2], pila[0][3]]
+                        errores.append(aux) 
+                        auxReporteria = []
+                        popPila()
+                else:
+                    aux = [pila[0][0], 'Se esperaba el símbolo ;', 'Sintáctico', pila[0][2], pila[0][3]]
+                    errores.append(aux) 
+                    auxReporteria = []
+                    popPila()
+            else:
+                aux = [pila[0][0], 'Se esperaba el símbolo )', 'Sintáctico', pila[0][2], pila[0][3]]
+                errores.append(aux) 
+                auxReporteria = []
+                popPila()
+        else:
+            aux = [pila[0][0], 'Se esperaba el token Cadena', 'Sintáctico', pila[0][2], pila[0][3]]
+            errores.append(aux) 
+            auxReporteria = []
+            popPila()
+    else:
+        aux = [pila[0][0], 'Se esperaba el símbolo (', 'Sintáctico', pila[0][2], pila[0][3]]
+        errores.append(aux) 
+        auxReporteria = []
+        popPila()    
+
+def validarMIN():
+    global auxReporteria
+    global listadoReporteria
+    campo = ''
+    res = validarParentesis(pila[0][0], 'a')
+    if res == True:
+        pila.pop(0)#Elimina el parentesis de la apertura.
+        if pila[0][1] == "Cadena":
+            #auxReporteria.append(darFormato(pila[0][0], pila[0][1]))
+            campo = pila[0][0]
+            pila.pop(0)
+            res2 = validarParentesis(pila[0][0], 'c')
+            if res2 == True:
+                pila.pop(0)#Elimina el parentesis de cierre.
+                if pila[0][0] == ';':
+                    pila.pop(0)
+                    res3 = buscarClave(darFormato(campo, 'Cadena'))#Obtiene la clave donde se va a buscar el máximo
+                    if res3[0] == True:
+                        res4 = obtenerMax_Min(res3[1], 'min')
+                        if res4 != None:
+                            auxReporteria.append(str(res4))
+                            listadoReporteria.append(auxReporteria)
+                            auxReporteria = []
+                            validarReporte()
+                        else:
+                            #Si entra aquí encontro un valor tipo string(no se puede encontrar el máximo).
+                            aux = [pila[0][0], 'Se esperaba un valor númerico.', 'Sintáctico', pila[0][2], pila[0][3]]
+                            errores.append(aux) 
+                            auxReporteria = []
+                            popPila()
+                    else:
+                        aux = [str(campo), 'No se encontro el campo indicado.', 'Ejecución', pila[0][2], pila[0][3]]
+                        errores.append(aux) 
+                        auxReporteria = []
+                        popPila()
+                else:
+                    aux = [pila[0][0], 'Se esperaba el símbolo ;', 'Sintáctico', pila[0][2], pila[0][3]]
+                    errores.append(aux) 
+                    auxReporteria = []
+                    popPila()
+            else:
+                aux = [pila[0][0], 'Se esperaba el símbolo )', 'Sintáctico', pila[0][2], pila[0][3]]
+                errores.append(aux) 
+                auxReporteria = []
+                popPila()
+        else:
+            aux = [pila[0][0], 'Se esperaba el token Cadena', 'Sintáctico', pila[0][2], pila[0][3]]
+            errores.append(aux) 
+            auxReporteria = []
+            popPila()
+    else:
+        aux = [pila[0][0], 'Se esperaba el símbolo (', 'Sintáctico', pila[0][2], pila[0][3]]
+        errores.append(aux) 
+        auxReporteria = []
+        popPila()
+
 
 def buscarClave(campo):
     for i in range(len(listadoClaves)):
@@ -1305,7 +1489,7 @@ def buscarClave(campo):
 
 def calcularPromedio(posicion):
     sumatoria = 0
-    total = len(listadoRegistros)
+    numeroRegistros = len(listadoRegistros)
     promedio = 0
     error = False
     for i in range(len(listadoRegistros)):
@@ -1317,7 +1501,7 @@ def calcularPromedio(posicion):
             error = True
             break
     if error == False:
-        promedio = sumatoria /  total
+        promedio = sumatoria /  numeroRegistros
     else:
         promedio = None
     return promedio
@@ -1329,9 +1513,60 @@ def calcularContarsi(posicion, valor):
             cantidad += 1
     return cantidad   
 
-#Devuelve la listad de comandos a ejecutar
-def getReporteria():
-    return listadoReporteria
+def calcularSuma(posicion):
+    suma = 0
+    error = False
+    for i in range(len(listadoRegistros)):
+        if type(listadoRegistros[i][posicion]) is int:
+            suma += listadoRegistros[i][posicion]
+        elif type(listadoRegistros[i][posicion]) is float:
+            suma += listadoRegistros[i][posicion]
+        elif type(listadoRegistros[i][posicion]) is str:
+            error = True
+            break
+    if error == True:
+        suma = None
+    return suma
 
-def getListados():
-    return listadoClaves, listadoRegistros
+def obtenerMax_Min(posicion, modo):
+    listado = []
+    if modo == 'max':
+        encontroString = False
+        for i in range(len(listadoRegistros)):
+            if type(listadoRegistros[i][posicion]) is str:
+                encontroString = True
+                break
+        if encontroString == False:
+            for elemento in listadoRegistros:
+                listado.append(elemento[posicion])
+            #Ordenando en forma ascedente
+            for i in range(len(listado)-1):
+                for j in range(len(listado)-1):
+                    if listado[j] > listado[j+1]:
+                        tmp = listado[j]
+                        listado[j] = listado[j+1]
+                        listado[j+1] = tmp
+            print(listado)
+            return listado[-1] #Devuelve la última posición
+        else:
+            return None
+    elif modo == 'min':
+        encontroString = False
+        for i in range(len(listadoRegistros)):
+            if type(listadoRegistros[i][posicion]) is str:
+                encontroString = True
+                break
+        if encontroString == False:
+            for elemento in listadoRegistros:
+                listado.append(elemento[posicion])
+            #Ordenando en forma ascedente
+            for i in range(len(listado)-1):
+                for j in range(len(listado)-1):
+                    if listado[j] > listado[j+1]:
+                        tmp = listado[j]
+                        listado[j] = listado[j+1]
+                        listado[j+1] = tmp
+            print(listado)
+            return listado[0] #Devuelve la primera posición
+        else:
+            return None        

@@ -88,6 +88,15 @@ def mostrarEnConsola():
             consola.insert(END,'\n')
             consola.insert(END,tabulate(lista2, headers = lista1))
             consola.insert(END,'\n')
+        elif elemento[0] == '07':
+            consola.insert(END, str(elemento[1]))
+            consola.insert(END,'\n')
+        elif elemento[0] == '08':
+            consola.insert(END, str(elemento[1]))
+            consola.insert(END,'\n')  
+        elif elemento[0] == '09':
+            consola.insert(END, str(elemento[1]))
+            consola.insert(END,'\n')          
 
     consola.config(state="disabled")#Se deshabilita la escritura de la consola y queda como solo lectura.
 
