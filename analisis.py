@@ -1076,10 +1076,10 @@ def validarCONTEO():
             pila.pop(0)
             if pila[0][0] == ';':
                 pila.pop(0)
-                numRegColumnas = len(listadoRegistros[0])#La cantidad de registros que tiene una fila
+                #numRegColumnas = len(listadoRegistros[0])#La cantidad de registros que tiene una fila
                 numRegFilas = len(listadoRegistros)#La cantidad de filas que hay
-                total = numRegColumnas * numRegFilas
-                auxReporteria.append(str(total))
+                #total = numRegColumnas * numRegFilas
+                auxReporteria.append(str(numRegFilas))
                 listadoReporteria.append(auxReporteria)
                 auxReporteria = []
                 validarReporte()
@@ -1328,7 +1328,6 @@ def calcularContarsi(posicion, valor):
         if listadoRegistros[i][posicion] == valor:
             cantidad += 1
     return cantidad   
-
 
 #Devuelve la listad de comandos a ejecutar
 def getReporteria():

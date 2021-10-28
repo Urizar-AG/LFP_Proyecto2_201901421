@@ -43,8 +43,8 @@ def getCodigo():
     global existenTokens
     global existenErrores
     global consola
-    consola.config(state='normal')
 
+    consola.config(state='normal')
     consola.delete(1.0, END)
     doc = editor.get(1.0, END)
     if len(doc)>0 and doc != '' and doc != '\n' and doc != '\t' and doc is not None:
@@ -64,10 +64,9 @@ def getCodigo():
 
 def mostrarEnConsola():
     global consola
-    consola.config(state='normal')
-
+    consola.config(state='normal')#Se habilita la edición para poder editar y borrar el contenido que ya tiene.
     consola.delete(1.0, END)
-
+    
     lista = getReporteria()
     for elemento in lista:
         if elemento[0] == '01':
@@ -77,18 +76,21 @@ def mostrarEnConsola():
             consola.insert(END,'\n')
         elif elemento[0] == '03':
             consola.insert(END, str(elemento[1]))
+            consola.insert(END,'\n')
         elif elemento[0] == '04':
             consola.insert(END, str(elemento[1]))
+            consola.insert(END,'\n')
         elif elemento[0] == '05':
             consola.insert(END, str(elemento[1]))
+            consola.insert(END,'\n')
         elif elemento[0] == '06':
             lista1, lista2 = getListados()
             consola.insert(END,'\n')
             consola.insert(END,tabulate(lista2, headers = lista1))
             consola.insert(END,'\n')
 
-    consola.config(state="disabled")
-    
+    consola.config(state="disabled")#Se deshabilita la escritura de la consola y queda como solo lectura.
+
 
 
 def getReporteTokens():
@@ -108,6 +110,17 @@ def getReporteErrores():
         startfile('Reportes\\ReporteErrores.html')
     else:
         messagebox.showerror(message='No hay errores que reportar', title='Reporte Errores')
+
+def limpiarEditor():
+    global editor
+    #editor.config(state='normal')
+    editor.delete(1.0, END)
+
+def limpiarConsola():
+    global consola
+    consola.config(state = 'normal')
+    consola.delete(1.0, END)
+    consola.config(state = 'disabled')
 
 def salir():
     respuesta = messagebox.askyesno(message="¿Está seguro de cerrar el programa?", title="Salir")
@@ -144,6 +157,8 @@ if __name__ == '__main__':
     #Menú Archvio
     archivoMenu = Menu(menuBar, tearoff=0, bg='#333A3B', fg='#FFFFFF')
     archivoMenu.add_command(label='Abrir', command=lambda:abrirFile())
+    archivoMenu.add_command(label='Limpiar editor', command=lambda: limpiarEditor())
+    archivoMenu.add_command(label='Limpiar consola', command=lambda: limpiarConsola())
     archivoMenu.add_separator()
     archivoMenu.add_command(label='Salir', command=lambda:salir())
 
